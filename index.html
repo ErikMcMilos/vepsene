@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vepsene Esport</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:#0a0a0a;color:#e8e8e0;min-height:100vh}
+.site{max-width:1100px;margin:0 auto;padding:0 1.5rem}
+nav{background:#0d0d0d;border-bottom:1px solid #f5c800;padding:0 1.5rem;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#f5c800;letter-spacing:2px;cursor:pointer}
+.nav-links{display:flex;gap:0}
+.nav-link{padding:0 18px;height:56px;display:flex;align-items:center;font-size:13px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:#888;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;text-decoration:none}
+.nav-link:hover,.nav-link.active{color:#f5c800;border-bottom-color:#f5c800}
+.page{display:none;padding:2rem 0 4rem}
+.page.active{display:block}
+.hero{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:3rem 2rem;margin-bottom:2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#f5c800}
+.hero-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#f5c800;margin-bottom:.75rem}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;line-height:1;color:#fff;margin-bottom:.5rem}
+.hero-sub{font-size:15px;color:#666;margin-bottom:2rem}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat-card{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:1rem;text-align:center}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:#f5c800}
+.stat-lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-top:2px}
+.roster-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:1.5rem}
+.player-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:1rem;text-align:center}
+.player-avatar{width:52px;height:52px;border-radius:50%;background:#1a1a00;border:2px solid #f5c800;margin:0 auto .75rem;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#f5c800}
+.player-tag{font-weight:500;font-size:14px;color:#e8e8e0}
+.player-role{font-size:11px;color:#555;margin-top:2px;letter-spacing:.5px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff}
+.section-line{flex:1;height:1px;background:#1e1e1e}
+.matches-table{width:100%;border-collapse:collapse}
+.matches-table th{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;padding:.5rem 1rem;text-align:left;border-bottom:1px solid #1e1e1e}
+.matches-table td{padding:.85rem 1rem;border-bottom:1px solid #111;font-size:14px}
+.matches-table tr:hover td{background:#0d0d0d}
+.badge{display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;font-weight:500}
+.badge-match{background:#1a1a00;color:#f5c800;border:1px solid #f5c800}
+.badge-tuesday{background:#1a0033;color:#a855f7;border:1px solid #6b21a8}
+.badge-training{background:#001a0d;color:#22c55e;border:1px solid #166534}
+.cal-btn{font-size:11px;padding:4px 10px;background:transparent;border:1px solid #1e1e1e;color:#888;border-radius:2px;cursor:pointer;transition:all .2s}
+.cal-btn:hover{border-color:#f5c800;color:#f5c800}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.gallery-item{aspect-ratio:16/9;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;overflow:hidden;position:relative}
+.gallery-item:hover{border-color:#f5c800}
+.gallery-img{width:100%;height:100%;object-fit:cover}
+.gallery-placeholder{font-size:28px;color:#333}
+.upload-zone{border:1px dashed #333;border-radius:4px;padding:2.5rem;text-align:center;color:#555;cursor:pointer;transition:border-color .2s}
+.upload-zone:hover{border-color:#f5c800;color:#f5c800}
+.merch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.merch-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;overflow:hidden}
+.merch-img{height:140px;background:#111;display:flex;align-items:center;justify-content:center;font-size:40px;border-bottom:1px solid #1e1e1e}
+.merch-info{padding:1rem}
+.merch-name{font-weight:500;font-size:14px;color:#e8e8e0;margin-bottom:4px}
+.merch-price{font-family:'Barlow Condensed',sans-serif;font-size:20px;color:#f5c800;font-weight:700;margin-bottom:.75rem}
+.btn-primary{background:#f5c800;color:#000;border:none;padding:8px 18px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:background .2s;font-family:'Barlow',sans-serif}
+.btn-primary:hover{background:#ffd700}
+.btn-secondary{background:transparent;color:#f5c800;border:1px solid #f5c800;padding:8px 18px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .2s;font-family:'Barlow',sans-serif}
+.btn-secondary:hover{background:#f5c800;color:#000}
+.cart-bar{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:1rem 1.5rem;margin-top:1.5rem;display:flex;align-items:center;justify-content:space-between}
+.stripe-note{background:#0d0d0d;border:1px solid #1e1e1e;border-left:3px solid #f5c800;border-radius:4px;padding:1rem 1.25rem;margin-top:1.5rem;font-size:13px;color:#888;line-height:1.6}
+.stripe-note strong{color:#f5c800}
+.stats-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.kpi-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:1rem;text-align:center}
+.kpi-num{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:#f5c800}
+.kpi-lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-top:2px}
+.stats-table{width:100%;border-collapse:collapse}
+.stats-table th{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;padding:.5rem .75rem;text-align:left;border-bottom:1px solid #1e1e1e;cursor:pointer}
+.stats-table th:hover{color:#f5c800}
+.stats-table td{padding:.75rem;border-bottom:1px solid #0f0f0f;font-size:13px}
+.stats-table tr:hover td{background:#0d0d0d}
+.rank-bar{height:4px;border-radius:2px;background:#f5c800;display:inline-block;vertical-align:middle;margin-left:8px}
+.gold{color:#f5c800}.silver{color:#aaa}.bronze{color:#cd7f32}
+.add-event-form{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:1.5rem;margin-bottom:1.5rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555}
+input,select{background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:8px 12px;border-radius:2px;font-size:14px;font-family:'Barlow',sans-serif;outline:none}
+input:focus,select:focus{border-color:#f5c800}
+select option{background:#111}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="showPage('home')">VEPSENE</div>
+    <div class="nav-links">
+      <a class="nav-link active" onclick="showPage('home')">Hjem</a>
+      <a class="nav-link" onclick="showPage('matches')">Kamper</a>
+      <a class="nav-link" onclick="showPage('stats')">Stats</a>
+      <a class="nav-link" onclick="showPage('gallery')">Galleri</a>
+      <a class="nav-link" onclick="showPage('merch')">Merch</a>
+    </div>
+  </div>
+</nav>
+
+<div class="site">
+
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-tag">Komplettligaen — Sesong 2025</div>
+    <div class="hero-title">VEPSENE</div>
+    <div class="hero-sub">Telianorgameplettligaen</div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num">8</div><div class="stat-lbl">Seire</div></div>
+      <div class="stat-card"><div class="stat-num">3</div><div class="stat-lbl">Tap</div></div>
+      <div class="stat-card"><div class="stat-num">72%</div><div class="stat-lbl">Winrate</div></div>
+      <div class="stat-card"><div class="stat-num">#3</div><div class="stat-lbl">Tabellplass</div></div>
+    </div>
+  </div>
+  <div class="section-header"><span class="section-title">Roster</span><div class="section-line"></div></div>
+  <div class="roster-grid">
+    <div class="player-card"><div class="player-avatar">ST</div><div class="player-tag">Stinger</div><div class="player-role">IGL</div></div>
+    <div class="player-card"><div class="player-avatar">VX</div><div class="player-tag">Vexor</div><div class="player-role">Entry</div></div>
+    <div class="player-card"><div class="player-avatar">ZN</div><div class="player-tag">Zenith</div><div class="player-role">Support</div></div>
+    <div class="player-card"><div class="player-avatar">BZ</div><div class="player-tag">Buzzkill</div><div class="player-role">AWP</div></div>
+    <div class="player-card"><div class="player-avatar">NX</div><div class="player-tag">Nexon</div><div class="player-role">Lurker</div></div>
+  </div>
+</div>
+
+<div id="page-matches" class="page">
+  <div class="add-event-form">
+    <div class="section-header" style="margin-bottom:1rem"><span class="section-title">Legg til avtale</span></div>
+    <div class="form-row">
+      <div class="form-group"><label>Tittel</label><input id="ev-title" placeholder="Kamp mot Teamet AS" /></div>
+      <div class="form-group"><label>Type</label><select id="ev-type"><option value="match">Kamp</option><option value="tuesday">Vepsene-tirsdag</option><option value="training">Trening</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Dato</label><input id="ev-date" type="date" /></div>
+      <div class="form-group"><label>Sted / server</label><input id="ev-location" placeholder="FACEIT / Discord" /></div>
+    </div>
+    <button class="btn-primary" onclick="addEvent()">Legg til</button>
+  </div>
+  <div class="section-header"><span class="section-title">Kommende</span><div class="section-line"></div></div>
+  <table class="matches-table">
+    <thead><tr><th>Dato</th><th>Kamp</th><th>Type</th><th>Sted</th><th>Kalender</th></tr></thead>
+    <tbody id="matches-body"></tbody>
+  </table>
+</div>
+
+<div id="page-stats" class="page">
+  <div class="stats-kpi">
+    <div class="kpi-card"><div class="kpi-num">1.24</div><div class="kpi-lbl">Snitt Rating</div></div>
+    <div class="kpi-card"><div class="kpi-num">68%</div><div class="kpi-lbl">HS%</div></div>
+    <div class="kpi-card"><div class="kpi-num">0.87</div><div class="kpi-lbl">K/D</div></div>
+    <div class="kpi-card"><div class="kpi-num">82</div><div class="kpi-lbl">Snitt ADR</div></div>
+  </div>
+  <div class="section-header"><span class="section-title">Spillerstatistikk</span><div class="section-line"></div></div>
+  <table class="stats-table" id="stats-table">
+    <thead>
+      <tr>
+        <th onclick="sortStats('rank')">#</th>
+        <th onclick="sortStats('name')">Spiller</th>
+        <th onclick="sortStats('rating')">Rating</th>
+        <th onclick="sortStats('kd')">K/D</th>
+        <th onclick="sortStats('adr')">ADR</th>
+        <th onclick="sortStats('hs')">HS%</th>
+        <th onclick="sortStats('entry')">Entry</th>
+      </tr>
+    </thead>
+    <tbody id="stats-body"></tbody>
+  </table>
+</div>
+
+<div id="page-gallery" class="page">
+  <div class="section-header"><span class="section-title">Bildegalleri</span><div class="section-line"></div></div>
+  <div class="gallery-grid" id="gallery-grid">
+    <div class="gallery-item"><div class="gallery-placeholder">📸</div></div>
+    <div class="gallery-item"><div class="gallery-placeholder">🎮</div></div>
+    <div class="gallery-item"><div class="gallery-placeholder">🏆</div></div>
+    <div class="gallery-item"><div class="gallery-placeholder">💻</div></div>
+    <div class="gallery-item"><div class="gallery-placeholder">🎯</div></div>
+    <div class="gallery-item"><div class="gallery-placeholder">🖥️</div></div>
+  </div>
+  <div class="upload-zone" style="margin-top:1rem" onclick="document.getElementById('img-upload').click()">
+    Klikk for å laste opp bilder (erstatter plassholderne)
+    <input id="img-upload" type="file" accept="image/*" multiple style="display:none" onchange="handleImages(event)" />
+  </div>
+</div>
+
+<div id="page-merch" class="page">
+  <div class="section-header"><span class="section-title">Merch</span><div class="section-line"></div></div>
+  <div class="merch-grid">
+    <div class="merch-card"><div class="merch-img">👕</div><div class="merch-info"><div class="merch-name">Vepsene Jersey 2025</div><div class="merch-price">399 kr</div><button class="btn-primary" onclick="addToCart('Jersey',399)">Legg i kurv</button></div></div>
+    <div class="merch-card"><div class="merch-img">🧢</div><div class="merch-info"><div class="merch-name">Vepsene Cap</div><div class="merch-price">249 kr</div><button class="btn-primary" onclick="addToCart('Cap',249)">Legg i kurv</button></div></div>
+    <div class="merch-card"><div class="merch-img">🎽</div><div class="merch-info"><div class="merch-name">Vepsene Hoodie</div><div class="merch-price">599 kr</div><button class="btn-primary" onclick="addToCart('Hoodie',599)">Legg i kurv</button></div></div>
+  </div>
+  <div class="cart-bar" id="cart-bar" style="display:none">
+    <span id="cart-summary"></span>
+    <button class="btn-primary" onclick="alert('Legg inn Stripe-nøkkel for å aktivere betaling!')">Gå til betaling (Stripe)</button>
+  </div>
+  <div class="stripe-note">
+    <strong>Stripe-betaling:</strong> Gi meg din Stripe Publishable Key, så aktiverer jeg ekte checkout. Uten nøkkel vises kurven, men betaling er ikke aktiv.<br>
+    Alternativt: Spreadshirt eller Printful lar deg lage merch uten lagerkostnader.
+  </div>
+</div>
+
+</div>
+
+<script>
+var events=[
+  {title:'Kamp vs Hexagon',type:'match',date:'2025-05-06',location:'FACEIT'},
+  {title:'Vepsene-tirsdag',type:'tuesday',date:'2025-05-13',location:'Discord #gaming'},
+  {title:'Kamp vs Nettverket',type:'match',date:'2025-05-20',location:'FACEIT'},
+  {title:'Vepsene-tirsdag',type:'tuesday',date:'2025-05-27',location:'Discord #gaming'},
+];
+var cart={};
+var statsData=[
+  {name:'Stinger',rating:1.41,kd:1.18,adr:88,hs:71,entry:12},
+  {name:'Buzzkill',rating:1.28,kd:1.05,adr:82,hs:63,entry:8},
+  {name:'Vexor',rating:1.19,kd:0.98,adr:79,hs:69,entry:15},
+  {name:'Zenith',rating:1.08,kd:0.91,adr:74,hs:59,entry:5},
+  {name:'Nexon',rating:1.02,kd:0.88,adr:68,hs:66,entry:9},
+];
+var sortKey='rating',sortDir=-1;
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active')});
+  document.querySelectorAll('.nav-link').forEach(function(x){x.classList.remove('active')});
+  document.getElementById('page-'+p).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(p==='matches')renderMatches();
+  if(p==='stats')renderStats();
+}
+
+function typeLabel(t){
+  if(t==='match')return '<span class="badge badge-match">Kamp</span>';
+  if(t==='tuesday')return '<span class="badge badge-tuesday">Vepsene-tirsdag</span>';
+  return '<span class="badge badge-training">Trening</span>';
+}
+
+function gcalLink(ev){
+  var d=ev.date.replace(/-/g,'');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(ev.title)+'&dates='+d+'T190000/'+d+'T210000&location='+encodeURIComponent(ev.location);
+}
+
+function toICS(title,date,location){
+  var d=date.replace(/-/g,'');
+  var blob=new Blob(['BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:'+d+'T190000\nDTEND:'+d+'T210000\nSUMMARY:'+title+'\nLOCATION:'+location+'\nEND:VEVENT\nEND:VCALENDAR'],{type:'text/calendar'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=title+'.ics';a.click();
+}
+
+function renderMatches(){
+  var b=document.getElementById('matches-body');
+  var sorted=events.slice().sort(function(a,b){return a.date.localeCompare(b.date)});
+  b.innerHTML=sorted.map(function(ev){
+    return '<tr><td style="color:#888;font-size:13px">'+ev.date+'</td><td style="font-weight:500">'+ev.title+'</td><td>'+typeLabel(ev.type)+'</td><td style="color:#666;font-size:13px">'+ev.location+'</td><td style="display:flex;gap:6px"><button class="cal-btn" onclick="window.open(\''+gcalLink(ev)+'\')">Google Cal</button><button class="cal-btn" onclick="toICS(\''+ev.title+'\',\''+ev.date+'\',\''+ev.location+'\')">iCal</button></td></tr>';
+  }).join('');
+}
+
+function addEvent(){
+  var t=document.getElementById('ev-title').value;
+  var d=document.getElementById('ev-date').value;
+  if(!t||!d)return;
+  events.push({title:t,type:document.getElementById('ev-type').value,date:d,location:document.getElementById('ev-location').value||'TBA'});
+  renderMatches();
+}
+
+function renderStats(){
+  var sorted=statsData.slice().sort(function(a,b){return sortDir*(b[sortKey]-a[sortKey])});
+  var maxR=Math.max.apply(null,sorted.map(function(s){return s.rating}));
+  document.getElementById('stats-body').innerHTML=sorted.map(function(p,i){
+    var cls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    var barW=Math.round((p.rating/maxR)*80);
+    return '<tr><td class="'+cls+'" style="font-weight:500">'+(i+1)+'</td><td style="font-weight:500">'+p.name+'</td><td><span class="'+cls+'">'+p.rating.toFixed(2)+'</span><span class="rank-bar" style="width:'+barW+'px"></span></td><td>'+p.kd.toFixed(2)+'</td><td>'+p.adr+'</td><td>'+p.hs+'%</td><td>'+p.entry+'</td></tr>';
+  }).join('');
+}
+
+function sortStats(k){sortKey=k;sortDir*=-1;renderStats();}
+
+function handleImages(e){
+  var grid=document.getElementById('gallery-grid');
+  var items=grid.querySelectorAll('.gallery-item');
+  var idx=0;
+  Array.from(e.target.files).forEach(function(f){
+    var r=new FileReader();
+    r.onload=function(ev){
+      if(idx<items.length){
+        items[idx].innerHTML='<img class="gallery-img" src="'+ev.target.result+'" />';
+        idx++;
+      } else {
+        var d=document.createElement('div');
+        d.className='gallery-item';
+        d.innerHTML='<img class="gallery-img" src="'+ev.target.result+'" />';
+        grid.appendChild(d);
+      }
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function addToCart(item,price){
+  cart[item]=(cart[item]||0)+1;
+  var bar=document.getElementById('cart-bar');
+  bar.style.display='flex';
+  var total=0;
+  Object.keys(cart).forEach(function(k){total+=cart[k]*(k==='Jersey'?399:k==='Cap'?249:599)});
+  document.getElementById('cart-summary').textContent=Object.keys(cart).map(function(k){return cart[k]+'x '+k}).join(', ')+' — '+total+' kr';
+}
+
+renderStats();
+renderMatches();
+</script>
+</body>
+</html>
