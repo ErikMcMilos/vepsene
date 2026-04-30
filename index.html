@@ -234,8 +234,8 @@ function handleExcel(e){
   reader.onload=function(ev){
     var wb=XLSX.read(ev.target.result,{type:'array'});
     var ws=wb.Sheets[wb.SheetNames[0]];
-    var rows=XLSX.utils.sheet_to_json(ws,{defval:null});
-    statsData=rows;
+    var rows=XLSX.utils.sheet_to_json(ws,{defval:null,range:1});
+    statsData=rows.filter(function(r){return r['Veps'] && r['Veps']!=='Veps'});
     document.getElementById('stats-empty').style.display='none';
     document.getElementById('stats-updated').style.display='block';
     document.getElementById('stats-updated').textContent='Oppdatert fra: '+file.name;
