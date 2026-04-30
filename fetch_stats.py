@@ -4,20 +4,20 @@
 fetch_stats.py — Henter Vepsene-stats fra gamer.no og lagrer som stats.json
 Brukes av GitHub Actions for automatisk oppdatering av nettsiden.
 """
-
+ 
 import json
 import os
 import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-
+ 
 import requests
-
+ 
 COMPETITION_URL = "https://www.gamer.no/turneringer/komplettligaen-counter-strike-varen-2026/13835"
 TEAM_ID = 84331
 BASE_API = "https://www.gamer.no/api/paradise"
-
+ 
 SESSION = requests.Session()
 SESSION.headers.update({
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
@@ -25,8 +25,8 @@ SESSION.headers.update({
     "Accept-Language": "nb-NO,nb;q=0.9,no;q=0.8,en;q=0.5",
     "x-requested-with": "XMLHttpRequest",
 })
-
-
+ 
+ 
 def load_cookies_from_env():
     cookie = os.environ.get("GAMER_COOKIE", "")
     xsrf = os.environ.get("GAMER_XSRF", "")
@@ -37,33 +37,33 @@ def load_cookies_from_env():
         SESSION.headers["x-xsrf-token"] = xsrf
     if not cookie:
         print("ADVARSEL: Ingen cookies funnet. API-kall kan feile.")
-
-
+ 
+ 
 def api_get(url):
     r = SESSION.get(url, timeout=45)
     r.raise_for_status()
     return r.json()
-
-
+ 
+ 
 def get_comp_id():
     m = re.search(r'gamer\.no/turneringer/[^/]+/(\d+)', COMPETITION_URL)
     if m:
         return int(m.group(1))
     raise ValueError("Kunne ikke hente competition ID fra URL")
-
-
+ 
+ 
 def get_phases(comp_id):
     return api_get(f"{BASE_API}/competition/{comp_id}/phases?page=1").get("data", [])
-
-
-def get_player_stats(comp_id):
+ 
+ 
+def get_player_stats(comp_id, phase_id):
     data = api_get(
         f"{BASE_API}/competition/{comp_id}/stats/players/extended"
-        f"?paradise_team_id={TEAM_ID}"
+        f"?paradise_team_id={TEAM_ID}&phase_id={phase_id}"
     )
     return data.get("data", [])
-
-
+ 
+ 
 def get_matches(comp_id):
     try:
         data = api_get(f"{BASE_API}/competition/{comp_id}/matches?paradise_team_id={TEAM_ID}&limit=50")
@@ -71,27 +71,43 @@ def get_matches(comp_id):
     except Exception as e:
         print(f"Kunne ikke hente kamper: {e}")
         return []
-
-
+ 
+ 
 def main():
     load_cookies_from_env()
-
+ 
     comp_id = get_comp_id()
     print(f"Competition ID: {comp_id}")
-
+ 
     # Hent turneringsinfo
-    comp_data = api_get(f"{BASE_API}/competition/{comp_id}")
-    comp_name = comp_data.get("competition", {}).get("name", "Komplettligaen")
-
+    try:
+        comp_data = api_get(f"{BASE_API}/competition/{comp_id}")
+        comp_name = comp_data.get("competition", {}).get("name", "Komplettligaen")
+    except Exception:
+        comp_name = "Komplettligaen"
+        print("Kunne ikke hente turneringsinfo, bruker standardnavn.")
+ 
+    # Hent faser
+    print("Henter faser...")
+    try:
+        phases = get_phases(comp_id)
+        active = [ph for ph in phases if ph.get("status") in ("started", "finished")]
+        chosen = active[-1] if active else (phases[0] if phases else None)
+        phase_id = chosen["id"] if chosen else None
+        print(f"  Bruker fase: {chosen.get('title') if chosen else 'ingen'}")
+    except Exception as e:
+        print(f"Kunne ikke hente faser: {e}")
+        phase_id = None
+ 
     # Hent spillerstatistikk
     print("Henter spillerstatistikk...")
-    players = get_player_stats(comp_id)
+    players = get_player_stats(comp_id, phase_id)
     print(f"  {len(players)} spillere funnet")
-
+ 
     # Hent kamper
     print("Henter kamper...")
     raw_matches = get_matches(comp_id)
-
+ 
     # Formater spillerdata
     player_list = []
     for p in sorted(players, key=lambda x: x.get("rating") or 0, reverse=True):
@@ -113,7 +129,7 @@ def main():
             "k4": p.get("rounds_with_4_kills"),
             "k5": p.get("rounds_with_5_kills"),
         })
-
+ 
     # Formater kamper
     match_list = []
     for m in raw_matches:
@@ -128,19 +144,20 @@ def main():
             "score_them": opp_score,
             "status": m.get("status", ""),
         })
-
+ 
     output = {
         "updated": datetime.now(timezone.utc).isoformat(),
         "competition": comp_name,
         "players": player_list,
         "matches": match_list,
     }
-
+ 
     out_path = Path(__file__).parent / "stats.json"
     out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\nLagret: {out_path}")
     print(f"Spillere: {len(player_list)}, Kamper: {len(match_list)}")
-
-
+ 
+ 
 if __name__ == "__main__":
     main()
+ 
