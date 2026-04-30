@@ -361,6 +361,21 @@ function addToCart(item,price){
 }
 
 renderMatches();
+
+fetch('https://raw.githubusercontent.com/ErikMcMilos/vepsene/main/CS_Stats_Komplettligaen%20Counter-strike%20-%20V%C3%A5ren%2020.xlsx')
+  .then(function(r){return r.arrayBuffer()})
+  .then(function(buf){
+    var wb=XLSX.read(buf,{type:'array'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var rows=XLSX.utils.sheet_to_json(ws,{defval:null,range:1});
+    statsData=rows.filter(function(r){return r['Veps'] && r['Veps']!=='Veps'});
+    updateKPI();
+    renderStats();
+    document.getElementById('stats-empty').style.display='none';
+    document.getElementById('stats-updated').style.display='block';
+    document.getElementById('stats-updated').textContent='Statistikk lastet automatisk fra GitHub';
+  })
+  .catch(function(e){console.log('Kunne ikke hente stats automatisk:',e)});
 </script>
 </body>
 </html>
