@@ -1,0 +1,32 @@
+name: Oppdater Vepsene-stats
+
+on:
+  schedule:
+    - cron: '0 23 * * 2'
+    - cron: '0 23 * * 0'
+  workflow_dispatch:
+
+jobs:
+  fetch-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hent kode
+        uses: actions/checkout@v4
+      - name: Sett opp Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Installer avhengigheter
+        run: pip install requests
+      - name: Hent stats fra gamer.no
+        env:
+          GAMER_COOKIE: ${{ secrets.GAMER_COOKIE }}
+          GAMER_XSRF: ${{ secrets.GAMER_XSRF }}
+        run: python fetch_stats.py
+      - name: Lagre stats.json til repo
+        run: |
+          git config user.name "Vepsene Bot"
+          git config user.email "bot@vepsene.no"
+          git add stats.json
+          git diff --staged --quiet || git commit -m "Oppdater stats $(date -u '+%Y-%m-%d %H:%M')"
+          git push
