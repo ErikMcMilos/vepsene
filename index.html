@@ -141,24 +141,35 @@ select option{background:#111}
     <div class="kpi-card"><div class="kpi-num" id="kpi-hs">—</div><div class="kpi-lbl">Beste HS%</div></div>
     <div class="kpi-card"><div class="kpi-num" id="kpi-players">—</div><div class="kpi-lbl">Spillere</div></div>
   </div>
+  <div id="stats-competition" style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:1rem;display:none"></div>
   <div class="section-header"><span class="section-title">Spillerstatistikk</span><div class="section-line"></div></div>
+  <div style="overflow-x:auto">
   <table class="stats-table">
     <thead>
       <tr>
-        <th onclick="sortStats('rank')">#</th>
-        <th onclick="sortStats('name')">Spiller</th>
-        <th onclick="sortStats('rating')">Rating</th>
+        <th onclick="sortStats('name')">Veps</th>
         <th onclick="sortStats('kills')">K</th>
         <th onclick="sortStats('assists')">A</th>
         <th onclick="sortStats('deaths')">D</th>
-        <th onclick="sortStats('hs_pct')">HS%</th>
-        <th onclick="sortStats('entry_kills')">Entry</th>
-        <th onclick="sortStats('clutches')">Clutch</th>
         <th onclick="sortStats('kd_diff')">+/-</th>
+        <th onclick="sortStats('maps_played')">Runder</th>
+        <th onclick="sortStats('rating')">Rating</th>
+        <th>Damage</th>
+        <th>ADR</th>
+        <th onclick="sortStats('entry_kills')">Entry Kills</th>
+        <th onclick="sortStats('hs_pct')">HS%</th>
+        <th onclick="sortStats('clutches')">Clutcher</th>
+        <th>Trades</th>
+        <th>Tradet%</th>
+        <th>2K</th>
+        <th>3K</th>
+        <th>4K</th>
+        <th>5K</th>
       </tr>
     </thead>
     <tbody id="stats-body"></tbody>
   </table>
+  </div>
   <div id="stats-empty" style="text-align:center;padding:3rem;color:#555;font-size:14px">
     Laster statistikk fra ggarena.no...
   </div>
@@ -400,6 +411,11 @@ function updateKPI() {
 
 function loadStatsJson(data) {
   statsData = data.players || [];
+  var compEl = document.getElementById('stats-competition');
+  if (data.competition) {
+    compEl.textContent = data.competition + '  —  Seriespill';
+    compEl.style.display = 'block';
+  }
   var matches = data.matches || [];
   events = matches.map(function(m) {
     var won = m.won;
@@ -419,6 +435,8 @@ function loadStatsJson(data) {
   renderResults();
 }
 
+function cell(v) { return '<td>' + (v != null ? v : '—') + '</td>'; }
+
 function renderStats() {
   if (!statsData.length) return;
   var sorted = statsData.slice().sort(function(a, b) {
@@ -430,20 +448,29 @@ function renderStats() {
   document.getElementById('stats-body').innerHTML = sorted.map(function(p, i) {
     var cls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
     var r = parseFloat(p.rating) || 0;
-    var barW = maxR > 0 ? Math.round((r / maxR) * 80) : 0;
+    var barW = maxR > 0 ? Math.round((r / maxR) * 60) : 0;
     var kd = p.kd_diff;
     var kdStyle = kd > 0 ? 'color:#22c55e' : kd < 0 ? 'color:#ef4444' : '';
+    var hs = p.hs_pct != null ? parseFloat(p.hs_pct).toFixed(1) + '%' : null;
     return '<tr>'
-      + '<td class="' + cls + '" style="font-weight:500">' + (i + 1) + '</td>'
-      + '<td style="font-weight:500">' + (p.name || '—') + '</td>'
-      + '<td><span class="' + cls + '">' + r.toFixed(2) + '</span><span class="rank-bar" style="width:' + barW + 'px"></span></td>'
-      + '<td>' + (p.kills != null ? p.kills : '—') + '</td>'
-      + '<td>' + (p.assists != null ? p.assists : '—') + '</td>'
-      + '<td>' + (p.deaths != null ? p.deaths : '—') + '</td>'
-      + '<td>' + (p.hs_pct != null ? parseFloat(p.hs_pct).toFixed(1) + '%' : '—') + '</td>'
-      + '<td>' + (p.entry_kills != null ? p.entry_kills : '—') + '</td>'
-      + '<td>' + (p.clutches != null ? p.clutches : '—') + '</td>'
+      + '<td style="font-weight:500;white-space:nowrap"><span class="' + cls + '">' + (p.name || '—') + '</span></td>'
+      + cell(p.kills)
+      + cell(p.assists)
+      + cell(p.deaths)
       + '<td style="' + kdStyle + '">' + (kd != null ? (kd > 0 ? '+' : '') + kd : '—') + '</td>'
+      + cell(p.maps_played)
+      + '<td><span class="' + cls + '">' + r.toFixed(2) + '</span><span class="rank-bar" style="width:' + barW + 'px"></span></td>'
+      + cell(p.damage)
+      + cell(p.adr)
+      + cell(p.entry_kills)
+      + '<td>' + (hs || '—') + '</td>'
+      + cell(p.clutches)
+      + cell(p.trades)
+      + cell(p.traded_pct != null ? parseFloat(p.traded_pct).toFixed(0) + '%' : null)
+      + cell(p.k2)
+      + cell(p.k3)
+      + cell(p.k4)
+      + cell(p.k5)
       + '</tr>';
   }).join('');
 }
