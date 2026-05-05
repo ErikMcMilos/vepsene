@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vepsene Esport</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Barlow',sans-serif;background:#0a0a0a;color:#e8e8e0;min-height:100vh}
@@ -16,35 +15,32 @@ nav{background:#0d0d0d;border-bottom:1px solid #f5c800;padding:0 1.5rem;position
 .nav-links{display:flex;gap:0}
 .nav-link{padding:0 18px;height:56px;display:flex;align-items:center;font-size:13px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:#888;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;text-decoration:none}
 .nav-link:hover,.nav-link.active{color:#f5c800;border-bottom-color:#f5c800}
+.nav-login{display:flex;align-items:center;gap:8px;font-size:12px}
+.nav-login .player-name{color:#f5c800;font-weight:500;font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase}
 .page{display:none;padding:2rem 0 4rem}
 .page.active{display:block}
-.hero{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:3rem 2rem;margin-bottom:2rem;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#f5c800}
-.hero-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#f5c800;margin-bottom:.75rem}
-.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;line-height:1;color:#fff;margin-bottom:.5rem}
-.hero-sub{font-size:15px;color:#666;margin-bottom:2rem}
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.stat-card{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:1rem;text-align:center}
-.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:#f5c800}
-.stat-lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-top:2px}
-.roster-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:1.5rem}
-.player-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:1rem;text-align:center}
-.player-avatar{width:52px;height:52px;border-radius:50%;background:#1a1a00;border:2px solid #f5c800;margin:0 auto .75rem;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#f5c800}
-.player-tag{font-weight:500;font-size:14px;color:#e8e8e0}
-.player-role{font-size:11px;color:#555;margin-top:2px;letter-spacing:.5px}
 .section-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
 .section-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff}
 .section-line{flex:1;height:1px;background:#1e1e1e}
 .matches-table{width:100%;border-collapse:collapse}
 .matches-table th{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;padding:.5rem 1rem;text-align:left;border-bottom:1px solid #1e1e1e}
-.matches-table td{padding:.85rem 1rem;border-bottom:1px solid #111;font-size:14px}
+.matches-table td{padding:.85rem 1rem;border-bottom:1px solid #111;font-size:14px;vertical-align:middle}
 .matches-table tr:hover td{background:#0d0d0d}
 .badge{display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;font-weight:500}
 .badge-match{background:#1a1a00;color:#f5c800;border:1px solid #f5c800}
 .badge-tuesday{background:#1a0033;color:#a855f7;border:1px solid #6b21a8}
-.badge-training{background:#001a0d;color:#22c55e;border:1px solid #166534}
-.cal-btn{font-size:11px;padding:4px 10px;background:transparent;border:1px solid #1e1e1e;color:#888;border-radius:2px;cursor:pointer;transition:all .2s}
+.badge-win{background:#001a0d;color:#22c55e;border:1px solid #166534}
+.badge-loss{background:#1a0000;color:#ef4444;border:1px solid #7f1d1d}
+.cal-btn{font-size:11px;padding:4px 10px;background:transparent;border:1px solid #1e1e1e;color:#888;border-radius:2px;cursor:pointer;transition:all .2s;font-family:'Barlow',sans-serif}
 .cal-btn:hover{border-color:#f5c800;color:#f5c800}
+.vote-btn{font-size:11px;padding:4px 10px;border-radius:2px;cursor:pointer;border:1px solid #1e1e1e;background:transparent;color:#888;font-family:'Barlow',sans-serif;transition:all .2s;white-space:nowrap}
+.vote-btn:hover{border-color:#555;color:#e8e8e0}
+.vote-btn.active-ja{background:#001a0d;color:#22c55e;border-color:#166534;font-weight:500}
+.vote-btn.active-nei{background:#1a0000;color:#ef4444;border-color:#7f1d1d;font-weight:500}
+.vote-btn.active-usikker{background:#1a1000;color:#f59e0b;border-color:#92400e;font-weight:500}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal-box{background:#0d0d0d;border:1px solid #f5c800;border-radius:4px;padding:2rem;width:300px}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:1.5rem;letter-spacing:1px;text-transform:uppercase}
 .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .gallery-item{aspect-ratio:16/9;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;overflow:hidden;position:relative}
 .gallery-item:hover{border-color:#f5c800}
@@ -60,12 +56,10 @@ nav{background:#0d0d0d;border-bottom:1px solid #f5c800;padding:0 1.5rem;position
 .merch-price{font-family:'Barlow Condensed',sans-serif;font-size:20px;color:#f5c800;font-weight:700;margin-bottom:.75rem}
 .btn-primary{background:#f5c800;color:#000;border:none;padding:8px 18px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:background .2s;font-family:'Barlow',sans-serif}
 .btn-primary:hover{background:#ffd700}
-.btn-secondary{background:transparent;color:#f5c800;border:1px solid #f5c800;padding:8px 18px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .2s;font-family:'Barlow',sans-serif}
-.btn-secondary:hover{background:#f5c800;color:#000}
 .cart-bar{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:1rem 1.5rem;margin-top:1.5rem;display:flex;align-items:center;justify-content:space-between}
 .stripe-note{background:#0d0d0d;border:1px solid #1e1e1e;border-left:3px solid #f5c800;border-radius:4px;padding:1rem 1.25rem;margin-top:1.5rem;font-size:13px;color:#888;line-height:1.6}
 .stripe-note strong{color:#f5c800}
-.stats-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.stats-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
 .kpi-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:1rem;text-align:center}
 .kpi-num{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:#f5c800}
 .kpi-lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-top:2px}
@@ -76,12 +70,9 @@ nav{background:#0d0d0d;border-bottom:1px solid #f5c800;padding:0 1.5rem;position
 .stats-table tr:hover td{background:#0d0d0d}
 .rank-bar{height:4px;border-radius:2px;background:#f5c800;display:inline-block;vertical-align:middle;margin-left:8px}
 .gold{color:#f5c800}.silver{color:#aaa}.bronze{color:#cd7f32}
-.add-event-form{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:1.5rem;margin-bottom:1.5rem}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.form-group{display:flex;flex-direction:column;gap:6px}
-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555}
-input,select{background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:8px 12px;border-radius:2px;font-size:14px;font-family:'Barlow',sans-serif;outline:none}
-input:focus,select:focus{border-color:#f5c800}
+label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;display:block;margin-bottom:6px}
+select{background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:8px 12px;border-radius:2px;font-size:14px;font-family:'Barlow',sans-serif;outline:none;width:100%}
+select:focus{border-color:#f5c800}
 select option{background:#111}
 </style>
 </head>
@@ -89,34 +80,61 @@ select option{background:#111}
 
 <nav>
   <div class="nav-inner">
-    <div class="nav-logo" onclick="showPage('home')">VEPSENE</div>
+    <div class="nav-logo" onclick="showPage('home',document.querySelector('.nav-link'))">VEPSENE</div>
     <div class="nav-links">
-      <a class="nav-link active" onclick="showPage('home')">Hjem</a>
-      <a class="nav-link" onclick="showPage('stats')">Stats</a>
-      <a class="nav-link" onclick="showPage('gallery')">Galleri</a>
-      <a class="nav-link" onclick="showPage('merch')">Merch</a>
+      <a class="nav-link active" onclick="showPage('home',this)">Hjem</a>
+      <a class="nav-link" onclick="showPage('results',this)">Resultater</a>
+      <a class="nav-link" onclick="showPage('stats',this)">Stats</a>
+      <a class="nav-link" onclick="showPage('gallery',this)">Galleri</a>
+      <a class="nav-link" onclick="showPage('merch',this)">Merch</a>
     </div>
+    <div class="nav-login" id="nav-login"></div>
   </div>
 </nav>
+
+<div id="login-modal" class="modal-overlay" style="display:none" onclick="closeLoginIfBg(event)">
+  <div class="modal-box">
+    <div class="modal-title">Logg inn</div>
+    <div style="margin-bottom:1.25rem">
+      <label>Hvem er du?</label>
+      <select id="login-player-select">
+        <option value="">Velg spiller...</option>
+        <option>baten420</option>
+        <option>Maikro</option>
+        <option>Waffuru</option>
+        <option>Gru91</option>
+        <option>MarcusCraig</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="doLogin()" style="width:100%">Logg inn</button>
+  </div>
+</div>
 
 <div class="site">
 
 <div id="page-home" class="page active">
-  <div class="section-header"><span class="section-title">Kampresultater</span><div class="section-line"></div></div>
+  <div class="section-header">
+    <span class="section-title">Kommende</span>
+    <div class="section-line"></div>
+    <span id="home-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for å stemme</span>
+  </div>
   <table class="matches-table">
-    <thead><tr><th>Dato</th><th>Kamp</th><th>Type</th><th>Sted</th><th>Kalender</th></tr></thead>
-    <tbody id="matches-body"></tbody>
+    <thead><tr><th>Dato</th><th>Arrangement</th><th>Type</th><th>Din stemme</th></tr></thead>
+    <tbody id="home-body"></tbody>
+  </table>
+</div>
+
+<div id="page-results" class="page">
+  <div class="section-header"><span class="section-title">Resultater</span><div class="section-line"></div></div>
+  <table class="matches-table">
+    <thead><tr><th>Dato</th><th>Kamp</th><th>Resultat</th><th>Score</th></tr></thead>
+    <tbody id="results-body"></tbody>
   </table>
 </div>
 
 <div id="page-stats" class="page">
-  <div class="upload-zone" style="margin-bottom:1.5rem" onclick="document.getElementById('excel-upload').click()">
-    Klikk for å laste opp Excel-fil fra gamer_stats
-    <div style="font-size:11px;margin-top:4px;color:#444">CS_Stats_Komplettligaen Counter-strike - Våren 20xx.xlsx</div>
-    <input id="excel-upload" type="file" accept=".xlsx,.xls" style="display:none" onchange="handleExcel(event)" />
-  </div>
   <div id="stats-updated" style="font-size:11px;color:#555;margin-bottom:1rem;display:none"></div>
-  <div class="stats-kpi" id="stats-kpi">
+  <div class="stats-kpi">
     <div class="kpi-card"><div class="kpi-num" id="kpi-rating">—</div><div class="kpi-lbl">Beste Rating</div></div>
     <div class="kpi-card"><div class="kpi-num" id="kpi-hs">—</div><div class="kpi-lbl">Beste HS%</div></div>
     <div class="kpi-card"><div class="kpi-num" id="kpi-players">—</div><div class="kpi-lbl">Spillere</div></div>
@@ -180,115 +198,232 @@ select option{background:#111}
 </div>
 
 <script>
-var events=[];
-var cart={};
-var statsData=[];
-var sortKey='rating',sortDir=1;
+var events = [];
+var cart = {};
+var statsData = [];
+var sortKey = 'rating', sortDir = 1;
+var currentPlayer = localStorage.getItem('vepsene_player') || null;
+var votes = JSON.parse(localStorage.getItem('vepsene_votes') || '{}');
 
-function updateKPI(){
-  if(!statsData.length)return;
-  var ratings=statsData.map(function(p){return parseFloat(p.rating)||0});
-  var hspcts=statsData.map(function(p){return parseFloat(p.hs_pct)||0});
-  document.getElementById('kpi-rating').textContent=Math.max.apply(null,ratings).toFixed(2);
-  document.getElementById('kpi-hs').textContent=Math.max.apply(null,hspcts).toFixed(1)+'%';
-  document.getElementById('kpi-players').textContent=statsData.length;
+/* ---- Login ---- */
+function showLogin() {
+  document.getElementById('login-modal').style.display = 'flex';
+}
+function closeLogin() {
+  document.getElementById('login-modal').style.display = 'none';
+}
+function closeLoginIfBg(e) {
+  if (e.target === document.getElementById('login-modal')) closeLogin();
+}
+function doLogin() {
+  var sel = document.getElementById('login-player-select').value;
+  if (!sel) return;
+  currentPlayer = sel;
+  localStorage.setItem('vepsene_player', sel);
+  closeLogin();
+  updateLoginBar();
+  renderHome();
+}
+function doLogout() {
+  currentPlayer = null;
+  localStorage.removeItem('vepsene_player');
+  updateLoginBar();
+  renderHome();
+}
+function updateLoginBar() {
+  var el = document.getElementById('nav-login');
+  var hint = document.getElementById('home-login-hint');
+  if (currentPlayer) {
+    el.innerHTML = '<span class="player-name">' + currentPlayer + '</span>&nbsp;<button class="cal-btn" onclick="doLogout()">Logg ut</button>';
+    if (hint) hint.style.display = 'none';
+  } else {
+    el.innerHTML = '<button class="cal-btn" onclick="showLogin()">Logg inn</button>';
+    if (hint) hint.style.display = '';
+  }
 }
 
-function loadStatsJson(data){
-  statsData=data.players||[];
-  var matches=data.matches||[];
-  events=matches.map(function(m){
-    var won=m.won;
-    var score=(m.score_us!=null)?' '+m.score_us+'-'+m.score_them:'';
-    var title=won===true?'Vepsene vant mot '+m.opponent+score:won===false?'Vepsene tapte mot '+m.opponent+score:'Vepsene vs '+m.opponent;
-    return {title:title,type:'match',date:m.date,location:'ggarena.no',won:won};
+/* ---- Voting ---- */
+function setVote(mid, vote) {
+  if (!currentPlayer) { showLogin(); return; }
+  if (!votes[currentPlayer]) votes[currentPlayer] = {};
+  if (votes[currentPlayer][mid] === vote) {
+    delete votes[currentPlayer][mid];
+  } else {
+    votes[currentPlayer][mid] = vote;
+  }
+  localStorage.setItem('vepsene_votes', JSON.stringify(votes));
+  renderHome();
+}
+function getVote(mid) {
+  if (!currentPlayer || !votes[currentPlayer]) return null;
+  return votes[currentPlayer][mid] || null;
+}
+
+/* ---- Auto-generate Vepsene-tirsdager ---- */
+function generateTirsdager(occupiedDates) {
+  var result = [];
+  var d = new Date();
+  d.setHours(0, 0, 0, 0);
+  var daysToTue = (2 - d.getDay() + 7) % 7;
+  d.setDate(d.getDate() + daysToTue);
+  var end = new Date('2026-06-30');
+  while (d <= end) {
+    var ds = d.toISOString().slice(0, 10);
+    if (occupiedDates.indexOf(ds) === -1) {
+      result.push({ title: 'Vepsene-tirsdag', type: 'tuesday', date: ds, id: ds + '_tirsdag', won: null });
+    }
+    d.setDate(d.getDate() + 7);
+  }
+  return result;
+}
+
+/* ---- Render home (upcoming) ---- */
+function renderHome() {
+  var allMatchDates = events.map(function(e) { return e.date; });
+  var tirsdager = generateTirsdager(allMatchDates);
+  var upcoming = events.filter(function(e) { return e.won == null; });
+  var all = upcoming.concat(tirsdager).sort(function(a, b) { return a.date.localeCompare(b.date); });
+
+  var b = document.getElementById('home-body');
+  if (!all.length) {
+    b.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:#555">Ingen kommende arrangementer</td></tr>';
+    return;
+  }
+  b.innerHTML = all.map(function(ev) {
+    var mid = ev.id;
+    var myVote = getVote(mid);
+    var voteHtml = currentPlayer
+      ? '<div style="display:flex;gap:4px;flex-wrap:wrap">'
+        + '<button class="vote-btn' + (myVote === 'ja' ? ' active-ja' : '') + '" onclick="setVote(\'' + mid + '\',\'ja\')">Ja</button>'
+        + '<button class="vote-btn' + (myVote === 'nei' ? ' active-nei' : '') + '" onclick="setVote(\'' + mid + '\',\'nei\')">Nei</button>'
+        + '<button class="vote-btn' + (myVote === 'usikker' ? ' active-usikker' : '') + '" onclick="setVote(\'' + mid + '\',\'usikker\')">Uncertainty looms</button>'
+        + '</div>'
+      : '<span style="font-size:11px;color:#444">—</span>';
+    return '<tr>'
+      + '<td style="color:#888;font-size:13px;white-space:nowrap">' + ev.date + '</td>'
+      + '<td style="font-weight:500">' + ev.title + '</td>'
+      + '<td>' + typeLabel(ev.type) + '</td>'
+      + '<td>' + voteHtml + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+/* ---- Render results (completed matches) ---- */
+function renderResults() {
+  var done = events
+    .filter(function(e) { return e.won === true || e.won === false; })
+    .sort(function(a, b) { return b.date.localeCompare(a.date); });
+  var b = document.getElementById('results-body');
+  if (!done.length) {
+    b.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:#555">Ingen resultater ennå</td></tr>';
+    return;
+  }
+  b.innerHTML = done.map(function(ev) {
+    var badge = ev.won
+      ? '<span class="badge badge-win">W</span>'
+      : '<span class="badge badge-loss">L</span>';
+    var scoreM = ev.title.match(/(\d+)-(\d+)/);
+    return '<tr>'
+      + '<td style="color:#888;font-size:13px;white-space:nowrap">' + ev.date + '</td>'
+      + '<td style="font-weight:500">' + ev.title + '</td>'
+      + '<td>' + badge + '</td>'
+      + '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:16px;color:#888">' + (scoreM ? scoreM[0] : '—') + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+/* ---- Shared ---- */
+function typeLabel(t) {
+  if (t === 'match') return '<span class="badge badge-match">Kamp</span>';
+  if (t === 'tuesday') return '<span class="badge badge-tuesday">Vepsene-tirsdag</span>';
+  return '<span class="badge" style="background:#111;color:#555;border:1px solid #1e1e1e">Trening</span>';
+}
+
+function showPage(p, el) {
+  document.querySelectorAll('.page').forEach(function(x) { x.classList.remove('active'); });
+  document.querySelectorAll('.nav-link').forEach(function(x) { x.classList.remove('active'); });
+  document.getElementById('page-' + p).classList.add('active');
+  if (el) el.classList.add('active');
+  if (p === 'stats') renderStats();
+  if (p === 'results') renderResults();
+}
+
+/* ---- Stats ---- */
+function updateKPI() {
+  if (!statsData.length) return;
+  var ratings = statsData.map(function(p) { return parseFloat(p.rating) || 0; });
+  var hspcts = statsData.map(function(p) { return parseFloat(p.hs_pct) || 0; });
+  document.getElementById('kpi-rating').textContent = Math.max.apply(null, ratings).toFixed(2);
+  document.getElementById('kpi-hs').textContent = Math.max.apply(null, hspcts).toFixed(1) + '%';
+  document.getElementById('kpi-players').textContent = statsData.length;
+}
+
+function loadStatsJson(data) {
+  statsData = data.players || [];
+  var matches = data.matches || [];
+  events = matches.map(function(m) {
+    var won = m.won;
+    var score = (m.score_us != null) ? ' ' + m.score_us + '-' + m.score_them : '';
+    var title = won === true ? 'Vepsene vant mot ' + m.opponent + score
+      : won === false ? 'Vepsene tapte mot ' + m.opponent + score
+      : 'Vepsene vs ' + m.opponent;
+    var safeOpp = (m.opponent || '').replace(/[^a-z0-9]/gi, '_');
+    return { title: title, type: 'match', date: m.date, won: won, id: m.date + '_' + safeOpp };
   });
-  document.getElementById('stats-empty').style.display='none';
-  document.getElementById('stats-updated').style.display='block';
-  document.getElementById('stats-updated').textContent='Oppdatert: '+new Date(data.updated).toLocaleString('nb-NO');
+  document.getElementById('stats-empty').style.display = 'none';
+  document.getElementById('stats-updated').style.display = 'block';
+  document.getElementById('stats-updated').textContent = 'Oppdatert: ' + new Date(data.updated).toLocaleString('nb-NO');
   updateKPI();
   renderStats();
-  renderMatches();
+  renderHome();
+  renderResults();
 }
 
-function showPage(p){
-  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active')});
-  document.querySelectorAll('.nav-link').forEach(function(x){x.classList.remove('active')});
-  document.getElementById('page-'+p).classList.add('active');
-  event.currentTarget.classList.add('active');
-  if(p==='stats')renderStats();
-}
-
-function typeLabel(t){
-  if(t==='match')return '<span class="badge badge-match">Kamp</span>';
-  if(t==='tuesday')return '<span class="badge badge-tuesday">Vepsene-tirsdag</span>';
-  return '<span class="badge badge-training">Trening</span>';
-}
-
-function gcalLink(ev){
-  var d=ev.date.replace(/-/g,'');
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(ev.title)+'&dates='+d+'T190000/'+d+'T210000&location='+encodeURIComponent(ev.location);
-}
-
-function toICS(title,date,location){
-  var d=date.replace(/-/g,'');
-  var blob=new Blob(['BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:'+d+'T190000\nDTEND:'+d+'T210000\nSUMMARY:'+title+'\nLOCATION:'+location+'\nEND:VEVENT\nEND:VCALENDAR'],{type:'text/calendar'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=title+'.ics';a.click();
-}
-
-function renderMatches(){
-  var b=document.getElementById('matches-body');
-  var sorted=events.slice().sort(function(a,b){return a.date.localeCompare(b.date)});
-  b.innerHTML=sorted.map(function(ev){
-    return '<tr><td style="color:#888;font-size:13px">'+ev.date+'</td><td style="font-weight:500">'+ev.title+'</td><td>'+typeLabel(ev.type)+'</td><td style="color:#666;font-size:13px">'+ev.location+'</td><td style="display:flex;gap:6px"><button class="cal-btn" onclick="window.open(\''+gcalLink(ev)+'\')">Google Cal</button><button class="cal-btn" onclick="toICS(\''+ev.title+'\',\''+ev.date+'\',\''+ev.location+'\')">iCal</button></td></tr>';
-  }).join('');
-}
-
-function renderStats(){
-  if(!statsData.length)return;
-  var sorted=statsData.slice().sort(function(a,b){
-    if(sortKey==='name') return sortDir*(String(a.name||'').localeCompare(String(b.name||'')));
-    var av=parseFloat(a[sortKey])||0, bv=parseFloat(b[sortKey])||0;
-    return sortDir*(bv-av);
+function renderStats() {
+  if (!statsData.length) return;
+  var sorted = statsData.slice().sort(function(a, b) {
+    if (sortKey === 'name') return sortDir * (String(a.name || '').localeCompare(String(b.name || '')));
+    var av = parseFloat(a[sortKey]) || 0, bv = parseFloat(b[sortKey]) || 0;
+    return sortDir * (bv - av);
   });
-  var maxR=Math.max.apply(null,sorted.map(function(p){return parseFloat(p.rating)||0}));
-  document.getElementById('stats-body').innerHTML=sorted.map(function(p,i){
-    var cls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    var r=parseFloat(p.rating)||0;
-    var barW=maxR>0?Math.round((r/maxR)*80):0;
-    var kd=p.kd_diff;
-    var kdStyle=kd>0?'color:#22c55e':kd<0?'color:#ef4444':'';
+  var maxR = Math.max.apply(null, sorted.map(function(p) { return parseFloat(p.rating) || 0; }));
+  document.getElementById('stats-body').innerHTML = sorted.map(function(p, i) {
+    var cls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    var r = parseFloat(p.rating) || 0;
+    var barW = maxR > 0 ? Math.round((r / maxR) * 80) : 0;
+    var kd = p.kd_diff;
+    var kdStyle = kd > 0 ? 'color:#22c55e' : kd < 0 ? 'color:#ef4444' : '';
     return '<tr>'
-      +'<td class="'+cls+'" style="font-weight:500">'+(i+1)+'</td>'
-      +'<td style="font-weight:500">'+(p.name||'—')+'</td>'
-      +'<td><span class="'+cls+'">'+r.toFixed(2)+'</span><span class="rank-bar" style="width:'+barW+'px"></span></td>'
-      +'<td>'+(p.kills!=null?p.kills:'—')+'</td>'
-      +'<td>'+(p.assists!=null?p.assists:'—')+'</td>'
-      +'<td>'+(p.deaths!=null?p.deaths:'—')+'</td>'
-      +'<td>'+(p.hs_pct!=null?parseFloat(p.hs_pct).toFixed(1)+'%':'—')+'</td>'
-      +'<td>'+(p.entry_kills!=null?p.entry_kills:'—')+'</td>'
-      +'<td>'+(p.clutches!=null?p.clutches:'—')+'</td>'
-      +'<td style="'+kdStyle+'">'+(kd!=null?(kd>0?'+':'')+kd:'—')+'</td>'
-      +'</tr>';
+      + '<td class="' + cls + '" style="font-weight:500">' + (i + 1) + '</td>'
+      + '<td style="font-weight:500">' + (p.name || '—') + '</td>'
+      + '<td><span class="' + cls + '">' + r.toFixed(2) + '</span><span class="rank-bar" style="width:' + barW + 'px"></span></td>'
+      + '<td>' + (p.kills != null ? p.kills : '—') + '</td>'
+      + '<td>' + (p.assists != null ? p.assists : '—') + '</td>'
+      + '<td>' + (p.deaths != null ? p.deaths : '—') + '</td>'
+      + '<td>' + (p.hs_pct != null ? parseFloat(p.hs_pct).toFixed(1) + '%' : '—') + '</td>'
+      + '<td>' + (p.entry_kills != null ? p.entry_kills : '—') + '</td>'
+      + '<td>' + (p.clutches != null ? p.clutches : '—') + '</td>'
+      + '<td style="' + kdStyle + '">' + (kd != null ? (kd > 0 ? '+' : '') + kd : '—') + '</td>'
+      + '</tr>';
   }).join('');
 }
 
-function sortStats(k){sortKey=k;sortDir*=-1;renderStats();}
+function sortStats(k) { sortKey = k; sortDir *= -1; renderStats(); }
 
-function handleImages(e){
-  var grid=document.getElementById('gallery-grid');
-  var items=grid.querySelectorAll('.gallery-item');
-  var idx=0;
-  Array.from(e.target.files).forEach(function(f){
-    var r=new FileReader();
-    r.onload=function(ev){
-      if(idx<items.length){
-        items[idx].innerHTML='<img class="gallery-img" src="'+ev.target.result+'" />';
+function handleImages(e) {
+  var grid = document.getElementById('gallery-grid');
+  var items = grid.querySelectorAll('.gallery-item');
+  var idx = 0;
+  Array.from(e.target.files).forEach(function(f) {
+    var r = new FileReader();
+    r.onload = function(ev) {
+      if (idx < items.length) {
+        items[idx].innerHTML = '<img class="gallery-img" src="' + ev.target.result + '" />';
         idx++;
       } else {
-        var d=document.createElement('div');
-        d.className='gallery-item';
-        d.innerHTML='<img class="gallery-img" src="'+ev.target.result+'" />';
+        var d = document.createElement('div');
+        d.className = 'gallery-item';
+        d.innerHTML = '<img class="gallery-img" src="' + ev.target.result + '" />';
         grid.appendChild(d);
       }
     };
@@ -296,22 +431,21 @@ function handleImages(e){
   });
 }
 
-function addToCart(item,price){
-  cart[item]=(cart[item]||0)+1;
-  var bar=document.getElementById('cart-bar');
-  bar.style.display='flex';
-  var total=0;
-  Object.keys(cart).forEach(function(k){total+=cart[k]*(k==='Jersey'?399:k==='Cap'?249:599)});
-  document.getElementById('cart-summary').textContent=Object.keys(cart).map(function(k){return cart[k]+'x '+k}).join(', ')+' — '+total+' kr';
+function addToCart(item, price) {
+  cart[item] = (cart[item] || 0) + 1;
+  document.getElementById('cart-bar').style.display = 'flex';
+  var total = 0;
+  Object.keys(cart).forEach(function(k) { total += cart[k] * (k === 'Jersey' ? 399 : k === 'Cap' ? 249 : 599); });
+  document.getElementById('cart-summary').textContent = Object.keys(cart).map(function(k) { return cart[k] + 'x ' + k; }).join(', ') + ' — ' + total + ' kr';
 }
 
-renderMatches();
+updateLoginBar();
+renderHome();
 
 fetch('stats.json')
-  .then(function(r){return r.json()})
-  .then(function(data){loadStatsJson(data)})
-  .catch(function(e){console.log('Kunne ikke hente stats.json:',e)});
+  .then(function(r) { return r.json(); })
+  .then(function(data) { loadStatsJson(data); })
+  .catch(function(e) { console.log('Kunne ikke hente stats.json:', e); });
 </script>
 </body>
 </html>
-  
