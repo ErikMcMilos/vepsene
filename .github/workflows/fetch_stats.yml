@@ -18,10 +18,7 @@ jobs:
           python-version: '3.11'
       - name: Installer avhengigheter
         run: pip install requests
-      - name: Hent stats fra gamer.no
-        env:
-          GAMER_COOKIE: ${{ secrets.GAMER_COOKIE }}
-          GAMER_XSRF: ${{ secrets.GAMER_XSRF }}
+      - name: Hent stats fra ggarena.no
         run: python fetch_stats.py
       - name: Lagre stats.json til repo
         run: |

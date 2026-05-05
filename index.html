@@ -154,7 +154,6 @@ select option{background:#111}
   <div class="stats-kpi" id="stats-kpi">
     <div class="kpi-card"><div class="kpi-num" id="kpi-rating">—</div><div class="kpi-lbl">Beste Rating</div></div>
     <div class="kpi-card"><div class="kpi-num" id="kpi-hs">—</div><div class="kpi-lbl">Beste HS%</div></div>
-    <div class="kpi-card"><div class="kpi-num" id="kpi-adr">—</div><div class="kpi-lbl">Beste ADR</div></div>
     <div class="kpi-card"><div class="kpi-num" id="kpi-players">—</div><div class="kpi-lbl">Spillere</div></div>
   </div>
   <div class="section-header"><span class="section-title">Spillerstatistikk</span><div class="section-line"></div></div>
@@ -162,22 +161,21 @@ select option{background:#111}
     <thead>
       <tr>
         <th onclick="sortStats('rank')">#</th>
-        <th onclick="sortStats('Veps')">Spiller</th>
-        <th onclick="sortStats('Rating')">Rating</th>
-        <th onclick="sortStats('K')">K</th>
-        <th onclick="sortStats('A')">A</th>
-        <th onclick="sortStats('D')">D</th>
-        <th onclick="sortStats('ADR')">ADR</th>
-        <th onclick="sortStats('HS%')">HS%</th>
-        <th onclick="sortStats('Entry Kills')">Entry</th>
-        <th onclick="sortStats('Clutcher')">Clutch</th>
-        <th onclick="sortStats('+/-')">+/-</th>
+        <th onclick="sortStats('name')">Spiller</th>
+        <th onclick="sortStats('rating')">Rating</th>
+        <th onclick="sortStats('kills')">K</th>
+        <th onclick="sortStats('assists')">A</th>
+        <th onclick="sortStats('deaths')">D</th>
+        <th onclick="sortStats('hs_pct')">HS%</th>
+        <th onclick="sortStats('entry_kills')">Entry</th>
+        <th onclick="sortStats('clutches')">Clutch</th>
+        <th onclick="sortStats('kd_diff')">+/-</th>
       </tr>
     </thead>
     <tbody id="stats-body"></tbody>
   </table>
   <div id="stats-empty" style="text-align:center;padding:3rem;color:#555;font-size:14px">
-    Last opp Excel-filen fra gamer_stats for å se statistikk
+    Laster statistikk fra ggarena.no...
   </div>
 </div>
 
@@ -217,46 +215,35 @@ select option{background:#111}
 </div>
 
 <script>
-var events=[
-  {title:'Vepsene vs Blinkesko Redux',type:'match',date:'2026-05-05',location:'gamer.no'},
-  {title:'pang_pangesen vs Vepsene',type:'match',date:'2026-05-06',location:'gamer.no'},
-  {title:'Vepsene vs Guttane (CS2)',type:'match',date:'2026-05-07',location:'gamer.no'},
-  {title:'Vepsene-tirsdag',type:'tuesday',date:'2026-05-12',location:'Discord #gaming'},
-  {title:'Hueklikk (CS2) vs Vepsene',type:'match',date:'2026-05-14',location:'gamer.no'},
-  {title:'Vepsene-tirsdag',type:'tuesday',date:'2026-05-19',location:'Discord #gaming'},
-  {title:'Vepsene-tirsdag',type:'tuesday',date:'2026-05-26',location:'Discord #gaming'},
-];
+var events=[];
 var cart={};
 var statsData=[];
-var sortKey='Rating',sortDir=1;
-
-function handleExcel(e){
-  var file=e.target.files[0];
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var wb=XLSX.read(ev.target.result,{type:'array'});
-    var ws=wb.Sheets[wb.SheetNames[0]];
-    var rows=XLSX.utils.sheet_to_json(ws,{defval:null,range:1});
-    statsData=rows.filter(function(r){return r['Veps'] && r['Veps']!=='Veps'});
-    document.getElementById('stats-empty').style.display='none';
-    document.getElementById('stats-updated').style.display='block';
-    document.getElementById('stats-updated').textContent='Oppdatert fra: '+file.name;
-    updateKPI();
-    renderStats();
-  };
-  reader.readAsArrayBuffer(file);
-}
+var sortKey='rating',sortDir=1;
 
 function updateKPI(){
   if(!statsData.length)return;
-  var ratings=statsData.map(function(p){return parseFloat(p['Rating'])||0});
-  var hspcts=statsData.map(function(p){return parseFloat(p['HS%'])||0});
-  var adrs=statsData.map(function(p){return parseFloat(p['ADR'])||0});
+  var ratings=statsData.map(function(p){return parseFloat(p.rating)||0});
+  var hspcts=statsData.map(function(p){return parseFloat(p.hs_pct)||0});
   document.getElementById('kpi-rating').textContent=Math.max.apply(null,ratings).toFixed(2);
   document.getElementById('kpi-hs').textContent=Math.max.apply(null,hspcts).toFixed(1)+'%';
-  document.getElementById('kpi-adr').textContent=Math.max.apply(null,adrs).toFixed(1);
   document.getElementById('kpi-players').textContent=statsData.length;
+}
+
+function loadStatsJson(data){
+  statsData=data.players||[];
+  var matches=data.matches||[];
+  events=matches.map(function(m){
+    var won=m.won;
+    var score=(m.score_us!=null)?' '+m.score_us+'-'+m.score_them:'';
+    var title=won===true?'Vepsene vant mot '+m.opponent+score:won===false?'Vepsene tapte mot '+m.opponent+score:'Vepsene vs '+m.opponent;
+    return {title:title,type:'match',date:m.date,location:'ggarena.no',won:won};
+  });
+  document.getElementById('stats-empty').style.display='none';
+  document.getElementById('stats-updated').style.display='block';
+  document.getElementById('stats-updated').textContent='Oppdatert: '+new Date(data.updated).toLocaleString('nb-NO');
+  updateKPI();
+  renderStats();
+  renderMatches();
 }
 
 function showPage(p){
@@ -304,28 +291,27 @@ function addEvent(){
 function renderStats(){
   if(!statsData.length)return;
   var sorted=statsData.slice().sort(function(a,b){
+    if(sortKey==='name') return sortDir*(String(a.name||'').localeCompare(String(b.name||'')));
     var av=parseFloat(a[sortKey])||0, bv=parseFloat(b[sortKey])||0;
-    if(sortKey==='Veps') return sortDir*(String(a[sortKey]||'').localeCompare(String(b[sortKey]||'')));
     return sortDir*(bv-av);
   });
-  var maxR=Math.max.apply(null,sorted.map(function(p){return parseFloat(p['Rating'])||0}));
+  var maxR=Math.max.apply(null,sorted.map(function(p){return parseFloat(p.rating)||0}));
   document.getElementById('stats-body').innerHTML=sorted.map(function(p,i){
     var cls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    var r=parseFloat(p['Rating'])||0;
+    var r=parseFloat(p.rating)||0;
     var barW=maxR>0?Math.round((r/maxR)*80):0;
-    var kd=p['+/-'];
+    var kd=p.kd_diff;
     var kdStyle=kd>0?'color:#22c55e':kd<0?'color:#ef4444':'';
     return '<tr>'
       +'<td class="'+cls+'" style="font-weight:500">'+(i+1)+'</td>'
-      +'<td style="font-weight:500">'+(p['Veps']||'—')+'</td>'
+      +'<td style="font-weight:500">'+(p.name||'—')+'</td>'
       +'<td><span class="'+cls+'">'+r.toFixed(2)+'</span><span class="rank-bar" style="width:'+barW+'px"></span></td>'
-      +'<td>'+(p['K']||'—')+'</td>'
-      +'<td>'+(p['A']||'—')+'</td>'
-      +'<td>'+(p['D']||'—')+'</td>'
-      +'<td>'+(p['ADR']!=null?parseFloat(p['ADR']).toFixed(1):'—')+'</td>'
-      +'<td>'+(p['HS%']!=null?parseFloat(p['HS%']).toFixed(1)+'%':'—')+'</td>'
-      +'<td>'+(p['Entry Kills']||'—')+'</td>'
-      +'<td>'+(p['Clutcher']||'—')+'</td>'
+      +'<td>'+(p.kills!=null?p.kills:'—')+'</td>'
+      +'<td>'+(p.assists!=null?p.assists:'—')+'</td>'
+      +'<td>'+(p.deaths!=null?p.deaths:'—')+'</td>'
+      +'<td>'+(p.hs_pct!=null?parseFloat(p.hs_pct).toFixed(1)+'%':'—')+'</td>'
+      +'<td>'+(p.entry_kills!=null?p.entry_kills:'—')+'</td>'
+      +'<td>'+(p.clutches!=null?p.clutches:'—')+'</td>'
       +'<td style="'+kdStyle+'">'+(kd!=null?(kd>0?'+':'')+kd:'—')+'</td>'
       +'</tr>';
   }).join('');
@@ -365,20 +351,10 @@ function addToCart(item,price){
 
 renderMatches();
 
-fetch('https://raw.githubusercontent.com/ErikMcMilos/vepsene/main/CS_Stats_Komplettligaen%20Counter-strike%20-%20V%C3%A5ren%2020.xlsx')
-  .then(function(r){return r.arrayBuffer()})
-  .then(function(buf){
-    var wb=XLSX.read(buf,{type:'array'});
-    var ws=wb.Sheets[wb.SheetNames[0]];
-    var rows=XLSX.utils.sheet_to_json(ws,{defval:null,range:1});
-    statsData=rows.filter(function(r){return r['Veps'] && r['Veps']!=='Veps'});
-    updateKPI();
-    renderStats();
-    document.getElementById('stats-empty').style.display='none';
-    document.getElementById('stats-updated').style.display='block';
-    document.getElementById('stats-updated').textContent='Statistikk lastet automatisk fra GitHub';
-  })
-  .catch(function(e){console.log('Kunne ikke hente stats automatisk:',e)});
+fetch('stats.json')
+  .then(function(r){return r.json()})
+  .then(function(data){loadStatsJson(data)})
+  .catch(function(e){console.log('Kunne ikke hente stats.json:',e)});
 </script>
 </body>
 </html>
