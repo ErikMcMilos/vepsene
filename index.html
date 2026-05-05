@@ -304,6 +304,12 @@ function getVote(mid) {
 }
 
 /* ---- Auto-generate Vepsene-tirsdager (only future) ---- */
+function localDateStr(d) {
+  var y = d.getFullYear();
+  var m = String(d.getMonth() + 1).padStart(2, '0');
+  var day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
 function today() {
   var d = new Date();
   d.setHours(0, 0, 0, 0);
@@ -313,11 +319,11 @@ function generateTirsdager(occupiedDates) {
   var result = [];
   var d = today();
   var daysToTue = (2 - d.getDay() + 7) % 7;
-  if (daysToTue === 0) daysToTue = 7; // skip today if it's Tuesday, show next week
+  if (daysToTue === 0) daysToTue = 7; // skip today if it's Tuesday, start next week
   d.setDate(d.getDate() + daysToTue);
-  var end = new Date('2026-06-30');
+  var end = new Date(2026, 5, 30); // 30. juni 2026, lokal tid
   while (d <= end) {
-    var ds = d.toISOString().slice(0, 10);
+    var ds = localDateStr(d);
     if (occupiedDates.indexOf(ds) === -1) {
       result.push({ title: 'Vepsene-tirsdag', type: 'tuesday', date: ds, id: ds + '_tirsdag', won: null });
     }
@@ -328,7 +334,7 @@ function generateTirsdager(occupiedDates) {
 
 /* ---- Render home (upcoming: future + no result) ---- */
 function renderHome() {
-  var todayStr = today().toISOString().slice(0, 10);
+  var todayStr = localDateStr(today());
   var allMatchDates = events.map(function(e) { return e.date; });
   var tirsdager = generateTirsdager(allMatchDates);
   var upcoming = events.filter(function(e) { return e.won == null && e.date >= todayStr; });
@@ -360,7 +366,7 @@ function renderHome() {
 
 /* ---- Render results (completed + past unresolved matches) ---- */
 function renderResults() {
-  var todayStr = today().toISOString().slice(0, 10);
+  var todayStr = localDateStr(today());
   var done = events
     .filter(function(e) { return e.won === true || e.won === false || (e.type === 'match' && e.date < todayStr); })
     .sort(function(a, b) { return b.date.localeCompare(a.date); });
