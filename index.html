@@ -63,6 +63,7 @@ nav{background:#0d0d0d;border-bottom:1px solid #f5c800;padding:0 1.5rem;position
 .merch-price{font-family:'Barlow Condensed',sans-serif;font-size:20px;color:#f5c800;font-weight:700;margin-bottom:.75rem}
 .btn-primary{background:#f5c800;color:#000;border:none;padding:8px 18px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:background .2s;font-family:'Barlow',sans-serif}
 .btn-primary:hover{background:#ffd700}
+.btn-soldout{background:#1a1a1a;color:#444;border:1px solid #222;padding:8px 18px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:not-allowed;font-family:'Barlow',sans-serif}
 .cart-bar{background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:1rem 1.5rem;margin-top:1.5rem;display:flex;align-items:center;justify-content:space-between}
 .stripe-note{background:#0d0d0d;border:1px solid #1e1e1e;border-left:3px solid #f5c800;border-radius:4px;padding:1rem 1.25rem;margin-top:1.5rem;font-size:13px;color:#888;line-height:1.6}
 .stripe-note strong{color:#f5c800}
@@ -193,18 +194,17 @@ select option{background:#111}
 
 <div id="page-merch" class="page">
   <div class="section-header"><span class="section-title">Merch</span><div class="section-line"></div></div>
-  <div class="merch-grid">
-    <div class="merch-card"><div class="merch-img">👕</div><div class="merch-info"><div class="merch-name">Vepsene Jersey 2025</div><div class="merch-price">399 kr</div><button class="btn-primary" onclick="addToCart('Jersey',399)">Legg i kurv</button></div></div>
-    <div class="merch-card"><div class="merch-img">🧢</div><div class="merch-info"><div class="merch-name">Vepsene Cap</div><div class="merch-price">249 kr</div><button class="btn-primary" onclick="addToCart('Cap',249)">Legg i kurv</button></div></div>
-    <div class="merch-card"><div class="merch-img">🎽</div><div class="merch-info"><div class="merch-name">Vepsene Hoodie</div><div class="merch-price">599 kr</div><button class="btn-primary" onclick="addToCart('Hoodie',599)">Legg i kurv</button></div></div>
-  </div>
-  <div class="cart-bar" id="cart-bar" style="display:none">
-    <span id="cart-summary"></span>
-    <button class="btn-primary" onclick="alert('Legg inn Stripe-nøkkel for å aktivere betaling!')">Gå til betaling (Stripe)</button>
-  </div>
-  <div class="stripe-note">
-    <strong>Stripe-betaling:</strong> Gi meg din Stripe Publishable Key, så aktiverer jeg ekte checkout. Uten nøkkel vises kurven, men betaling er ikke aktiv.<br>
-    Alternativt: Spreadshirt eller Printful lar deg lage merch uten lagerkostnader.
+  <div class="merch-grid" style="grid-template-columns:repeat(1,320px)">
+    <div class="merch-card">
+      <div class="merch-img" style="height:260px;background:#fff">
+        <img src="merch.png" style="height:100%;width:100%;object-fit:contain" alt="Vepsene Body" />
+      </div>
+      <div class="merch-info">
+        <div class="merch-name">Vepsene Body</div>
+        <div class="merch-price" style="margin-bottom:.75rem">—</div>
+        <button class="btn-soldout" disabled>Utsolgt</button>
+      </div>
+    </div>
   </div>
 </div>
 
