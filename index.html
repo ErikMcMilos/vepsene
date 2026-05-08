@@ -113,8 +113,16 @@ select option{background:#111}
     <div class="section-line"></div>
     <span id="home-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for å stemme</span>
   </div>
+  <div id="token-setup" style="display:none;background:#0d0d0d;border:1px solid #f5c800;border-radius:4px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:13px">
+    <div style="color:#f5c800;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem">Aktiver stemmedeling</div>
+    <div style="color:#666;font-size:12px;margin-bottom:.75rem">Lim inn vote-tokenet (én gang per enhet) for å dele stemmer med laget.</div>
+    <div style="display:flex;gap:8px">
+      <input id="token-input" type="password" placeholder="ghp_..." style="flex:1;background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:7px 10px;border-radius:2px;font-size:13px;font-family:'Barlow',sans-serif;outline:none" />
+      <button class="btn-primary" onclick="setVoteToken(document.getElementById('token-input').value)">Lagre</button>
+    </div>
+  </div>
   <table class="matches-table">
-    <thead><tr><th>Dato</th><th>Arrangement</th><th>Type</th><th>Din stemme</th></tr></thead>
+    <thead><tr><th>Dato</th><th>Arrangement</th><th>Type</th><th>Stemmer</th></tr></thead>
     <tbody id="home-body"></tbody>
   </table>
 </div>
@@ -194,6 +202,46 @@ var sortKey = 'rating', sortDir = 1;
 var currentPlayer = localStorage.getItem('vepsene_player') || null;
 var votes = JSON.parse(localStorage.getItem('vepsene_votes') || '{}');
 
+/* ---- Gist-synkronisering ---- */
+var GIST_ID = '944a3e28449f64c9fe74aea224c5f759';
+var GIST_API = 'https://api.github.com/gists/' + GIST_ID;
+var voteToken = localStorage.getItem('vepsene_vote_token') || '';
+
+function fetchVotes() {
+  fetch(GIST_API)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var content = data.files && data.files['votes.json'] && data.files['votes.json'].content;
+      if (!content) return;
+      var remote = JSON.parse(content);
+      Object.keys(remote).forEach(function(pl) {
+        votes[pl] = remote[pl];
+      });
+      localStorage.setItem('vepsene_votes', JSON.stringify(votes));
+      renderHome();
+    })
+    .catch(function() {});
+}
+
+function pushVotes() {
+  if (!voteToken) return;
+  fetch(GIST_API, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': 'token ' + voteToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ files: { 'votes.json': { content: JSON.stringify(votes) } } })
+  }).catch(function() {});
+}
+
+function setVoteToken(t) {
+  voteToken = t.trim();
+  localStorage.setItem('vepsene_vote_token', voteToken);
+  document.getElementById('token-setup').style.display = 'none';
+  pushVotes();
+}
+
 var STEAM_MAP = {
   '76561198026901081': 'Waffuru',
   '76561198065075906': 'Gru91',
@@ -266,7 +314,7 @@ function updateLoginBar() {
 
 /* ---- Voting ---- */
 function setVote(mid, vote) {
-  if (!currentPlayer) { showLogin(); return; }
+  if (!currentPlayer) return;
   if (!votes[currentPlayer]) votes[currentPlayer] = {};
   if (votes[currentPlayer][mid] === vote) {
     delete votes[currentPlayer][mid];
@@ -275,6 +323,7 @@ function setVote(mid, vote) {
   }
   localStorage.setItem('vepsene_votes', JSON.stringify(votes));
   renderHome();
+  pushVotes();
 }
 function getVote(mid) {
   if (!currentPlayer || !votes[currentPlayer]) return null;
@@ -497,6 +546,10 @@ if (currentPlayer) {
   unlockSite();
   updateLoginBar();
   renderHome();
+  fetchVotes();
+  if (!voteToken) {
+    document.getElementById('token-setup').style.display = 'block';
+  }
 }
 
 fetch('stats.json')
