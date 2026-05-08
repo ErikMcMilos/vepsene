@@ -113,13 +113,9 @@ select option{background:#111}
     <div class="section-line"></div>
     <span id="home-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for å stemme</span>
   </div>
-  <div id="token-setup" style="display:none;background:#0d0d0d;border:1px solid #f5c800;border-radius:4px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:13px">
-    <div style="color:#f5c800;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem">Aktiver stemmedeling</div>
-    <div style="color:#666;font-size:12px;margin-bottom:.75rem">Lim inn vote-tokenet (én gang per enhet) for å dele stemmer med laget.</div>
-    <div style="display:flex;gap:8px">
-      <input id="token-input" type="password" placeholder="ghp_..." style="flex:1;background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:7px 10px;border-radius:2px;font-size:13px;font-family:'Barlow',sans-serif;outline:none" />
-      <button class="btn-primary" onclick="setVoteToken(document.getElementById('token-input').value)">Lagre</button>
-    </div>
+  <div id="share-bar" style="display:none;margin-bottom:1.25rem">
+    <button id="share-btn" class="cal-btn" onclick="copyShareLink()" style="font-size:12px;padding:6px 14px">Del stemmer (kopier link)</button>
+    <span style="font-size:11px;color:#444;margin-left:10px">Lim inn i Discord — de andre klikker linken og ser stemmene dine</span>
   </div>
   <table class="matches-table">
     <thead><tr><th>Dato</th><th>Arrangement</th><th>Type</th><th>Stemmer</th></tr></thead>
@@ -202,44 +198,33 @@ var sortKey = 'rating', sortDir = 1;
 var currentPlayer = localStorage.getItem('vepsene_player') || null;
 var votes = JSON.parse(localStorage.getItem('vepsene_votes') || '{}');
 
-/* ---- Gist-synkronisering ---- */
-var GIST_ID = '944a3e28449f64c9fe74aea224c5f759';
-var GIST_API = 'https://api.github.com/gists/' + GIST_ID;
-var voteToken = localStorage.getItem('vepsene_vote_token') || '';
-
-function fetchVotes() {
-  fetch(GIST_API)
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var content = data.files && data.files['votes.json'] && data.files['votes.json'].content;
-      if (!content) return;
-      var remote = JSON.parse(content);
-      Object.keys(remote).forEach(function(pl) {
-        votes[pl] = remote[pl];
-      });
-      localStorage.setItem('vepsene_votes', JSON.stringify(votes));
-      renderHome();
-    })
-    .catch(function() {});
+/* ---- Del-link stemmedeling ---- */
+function voteShareUrl() {
+  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(votes))));
+  return window.location.origin + window.location.pathname + '#v=' + encoded;
 }
 
-function pushVotes() {
-  if (!voteToken) return;
-  fetch(GIST_API, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': 'token ' + voteToken,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ files: { 'votes.json': { content: JSON.stringify(votes) } } })
-  }).catch(function() {});
+function mergeVotesFromHash() {
+  var hash = window.location.hash;
+  if (!hash || hash.indexOf('#v=') !== 0) return;
+  try {
+    var decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(3)))));
+    Object.keys(decoded).forEach(function(pl) {
+      votes[pl] = decoded[pl];
+    });
+    localStorage.setItem('vepsene_votes', JSON.stringify(votes));
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } catch(e) {}
 }
 
-function setVoteToken(t) {
-  voteToken = t.trim();
-  localStorage.setItem('vepsene_vote_token', voteToken);
-  document.getElementById('token-setup').style.display = 'none';
-  pushVotes();
+function copyShareLink() {
+  var url = voteShareUrl();
+  navigator.clipboard.writeText(url).then(function() {
+    var btn = document.getElementById('share-btn');
+    var orig = btn.textContent;
+    btn.textContent = 'Kopiert!';
+    setTimeout(function() { btn.textContent = orig; }, 2000);
+  });
 }
 
 var STEAM_MAP = {
@@ -322,8 +307,9 @@ function setVote(mid, vote) {
     votes[currentPlayer][mid] = vote;
   }
   localStorage.setItem('vepsene_votes', JSON.stringify(votes));
+  var bar = document.getElementById('share-bar');
+  if (bar) bar.style.display = 'block';
   renderHome();
-  pushVotes();
 }
 function getVote(mid) {
   if (!currentPlayer || !votes[currentPlayer]) return null;
@@ -541,15 +527,12 @@ function addToCart(item, price) {
   document.getElementById('cart-summary').textContent = Object.keys(cart).map(function(k) { return cart[k] + 'x ' + k; }).join(', ') + ' — ' + total + ' kr';
 }
 
+mergeVotesFromHash();
 checkSteamReturn();
 if (currentPlayer) {
   unlockSite();
   updateLoginBar();
   renderHome();
-  fetchVotes();
-  if (!voteToken) {
-    document.getElementById('token-setup').style.display = 'block';
-  }
 }
 
 fetch('stats.json')
