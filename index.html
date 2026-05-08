@@ -206,6 +206,19 @@ var GIST_ID = '944a3e28449f64c9fe74aea224c5f759';
 var GIST_API = 'https://api.github.com/gists/' + GIST_ID;
 var GIST_TOKEN = localStorage.getItem('vepsene_gist_token') || '';
 
+/* Les token fra setup-URL (#gist-setup=TOKEN) */
+(function() {
+  var h = window.location.hash;
+  if (h && h.indexOf('#gist-setup=') === 0) {
+    var t = h.slice(12);
+    if (t) {
+      localStorage.setItem('vepsene_gist_token', t);
+      GIST_TOKEN = t;
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+})();
+
 function fetchVotes() {
   fetch(GIST_API, { cache: 'no-store' })
     .then(function(r) { return r.json(); })
@@ -552,7 +565,7 @@ if (currentPlayer) {
   updateLoginBar();
   fetchVotes();
   setInterval(fetchVotes, 30000);
-  if (!GIST_TOKEN) document.getElementById('token-bar').style.display = 'block';
+  document.getElementById('token-bar').style.display = GIST_TOKEN ? 'none' : 'block';
   renderHome();
 }
 
