@@ -113,9 +113,12 @@ select option{background:#111}
     <div class="section-line"></div>
     <span id="home-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for å stemme</span>
   </div>
-  <div id="share-bar" style="display:none;margin-bottom:1.25rem">
-    <button id="share-btn" class="cal-btn" onclick="copyShareLink()" style="font-size:12px;padding:6px 14px">Del stemmer (kopier link)</button>
-    <span style="font-size:11px;color:#444;margin-left:10px">Lim inn i Discord — de andre klikker linken og ser stemmene dine</span>
+  <div id="token-bar" style="display:none;background:#0d0d0d;border:1px solid #333;border-left:3px solid #f5c800;border-radius:4px;padding:.875rem 1.25rem;margin-bottom:1.25rem">
+    <div style="font-size:12px;color:#888;margin-bottom:.6rem">Lim inn gist-token for å aktivere live stemmedeling med laget:</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="token-input" type="password" placeholder="ghp_..." style="flex:1;background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:6px 10px;border-radius:2px;font-size:13px;font-family:'Barlow',sans-serif;outline:none" onkeydown="if(event.key==='Enter')saveToken(this.value)" />
+      <button class="btn-primary" onclick="saveToken(document.getElementById('token-input').value)" style="white-space:nowrap">Aktiver</button>
+    </div>
   </div>
   <table class="matches-table">
     <thead><tr><th>Dato</th><th>Arrangement</th><th>Type</th><th>Stemmer</th></tr></thead>
@@ -198,33 +201,50 @@ var sortKey = 'rating', sortDir = 1;
 var currentPlayer = localStorage.getItem('vepsene_player') || null;
 var votes = JSON.parse(localStorage.getItem('vepsene_votes') || '{}');
 
-/* ---- Del-link stemmedeling ---- */
-function voteShareUrl() {
-  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(votes))));
-  return window.location.origin + window.location.pathname + '#v=' + encoded;
+/* ---- Live stemmedeling via GitHub Gist ---- */
+var GIST_ID = '944a3e28449f64c9fe74aea224c5f759';
+var GIST_API = 'https://api.github.com/gists/' + GIST_ID;
+var GIST_TOKEN = localStorage.getItem('vepsene_gist_token') || '';
+
+function fetchVotes() {
+  fetch(GIST_API, { cache: 'no-store' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var f = data.files && data.files['votes.json'];
+      if (!f) return;
+      var remote = JSON.parse(f.content);
+      var changed = false;
+      Object.keys(remote).forEach(function(pl) {
+        if (JSON.stringify(votes[pl]) !== JSON.stringify(remote[pl])) {
+          votes[pl] = remote[pl];
+          changed = true;
+        }
+      });
+      if (changed) {
+        localStorage.setItem('vepsene_votes', JSON.stringify(votes));
+        renderHome();
+      }
+    })
+    .catch(function() {});
 }
 
-function mergeVotesFromHash() {
-  var hash = window.location.hash;
-  if (!hash || hash.indexOf('#v=') !== 0) return;
-  try {
-    var decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(3)))));
-    Object.keys(decoded).forEach(function(pl) {
-      votes[pl] = decoded[pl];
-    });
-    localStorage.setItem('vepsene_votes', JSON.stringify(votes));
-    window.history.replaceState({}, document.title, window.location.pathname);
-  } catch(e) {}
+function pushVotes() {
+  var tok = GIST_TOKEN || localStorage.getItem('vepsene_gist_token');
+  if (!tok) return;
+  fetch(GIST_API, {
+    method: 'PATCH',
+    headers: { 'Authorization': 'token ' + tok, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ files: { 'votes.json': { content: JSON.stringify(votes) } } })
+  }).catch(function() {});
 }
 
-function copyShareLink() {
-  var url = voteShareUrl();
-  navigator.clipboard.writeText(url).then(function() {
-    var btn = document.getElementById('share-btn');
-    var orig = btn.textContent;
-    btn.textContent = 'Kopiert!';
-    setTimeout(function() { btn.textContent = orig; }, 2000);
-  });
+function saveToken(tok) {
+  tok = tok.trim();
+  if (!tok) return;
+  GIST_TOKEN = tok;
+  localStorage.setItem('vepsene_gist_token', tok);
+  document.getElementById('token-bar').style.display = 'none';
+  pushVotes();
 }
 
 var STEAM_MAP = {
@@ -307,9 +327,8 @@ function setVote(mid, vote) {
     votes[currentPlayer][mid] = vote;
   }
   localStorage.setItem('vepsene_votes', JSON.stringify(votes));
-  var bar = document.getElementById('share-bar');
-  if (bar) bar.style.display = 'block';
   renderHome();
+  pushVotes();
 }
 function getVote(mid) {
   if (!currentPlayer || !votes[currentPlayer]) return null;
@@ -527,11 +546,13 @@ function addToCart(item, price) {
   document.getElementById('cart-summary').textContent = Object.keys(cart).map(function(k) { return cart[k] + 'x ' + k; }).join(', ') + ' — ' + total + ' kr';
 }
 
-mergeVotesFromHash();
 checkSteamReturn();
 if (currentPlayer) {
   unlockSite();
   updateLoginBar();
+  fetchVotes();
+  setInterval(fetchVotes, 30000);
+  if (!GIST_TOKEN) document.getElementById('token-bar').style.display = 'block';
   renderHome();
 }
 
