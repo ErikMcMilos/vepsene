@@ -113,13 +113,6 @@ select option{background:#111}
     <div class="section-line"></div>
     <span id="home-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for å stemme</span>
   </div>
-  <div id="token-bar" style="display:none;background:#0d0d0d;border:1px solid #333;border-left:3px solid #f5c800;border-radius:4px;padding:.875rem 1.25rem;margin-bottom:1.25rem">
-    <div style="font-size:12px;color:#888;margin-bottom:.6rem">Lim inn gist-token for å aktivere live stemmedeling med laget:</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="token-input" type="password" placeholder="ghp_..." style="flex:1;background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:6px 10px;border-radius:2px;font-size:13px;font-family:'Barlow',sans-serif;outline:none" onkeydown="if(event.key==='Enter')saveToken(this.value)" />
-      <button class="btn-primary" onclick="saveToken(document.getElementById('token-input').value)" style="white-space:nowrap">Aktiver</button>
-    </div>
-  </div>
   <table class="matches-table">
     <thead><tr><th>Dato</th><th>Arrangement</th><th>Type</th><th>Stemmer</th></tr></thead>
     <tbody id="home-body"></tbody>
@@ -237,15 +230,6 @@ function pushVotes() {
     headers: { 'Authorization': 'token ' + tok, 'Content-Type': 'application/json' },
     body: JSON.stringify({ files: { 'votes.json': { content: JSON.stringify(votes) } } })
   }).catch(function() {});
-}
-
-function saveToken(tok) {
-  tok = tok.trim();
-  if (!tok) return;
-  GIST_TOKEN = tok;
-  localStorage.setItem('vepsene_gist_token', tok);
-  document.getElementById('token-bar').style.display = 'none';
-  pushVotes();
 }
 
 var STEAM_MAP = {
@@ -553,7 +537,6 @@ if (currentPlayer) {
   updateLoginBar();
   fetchVotes();
   setInterval(fetchVotes, 30000);
-  document.getElementById('token-bar').style.display = 'none';
   renderHome();
 }
 
