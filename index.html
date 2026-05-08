@@ -48,13 +48,6 @@ nav{background:#0d0d0d;border-bottom:1px solid #f5c800;padding:0 1.5rem;position
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center}
 .modal-box{background:#0d0d0d;border:1px solid #f5c800;border-radius:4px;padding:2rem;width:300px}
 .modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:1.5rem;letter-spacing:1px;text-transform:uppercase}
-.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.gallery-item{aspect-ratio:16/9;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;overflow:hidden;position:relative}
-.gallery-item:hover{border-color:#f5c800}
-.gallery-img{width:100%;height:100%;object-fit:cover}
-.gallery-placeholder{font-size:28px;color:#333}
-.upload-zone{border:1px dashed #333;border-radius:4px;padding:2.5rem;text-align:center;color:#555;cursor:pointer;transition:border-color .2s}
-.upload-zone:hover{border-color:#f5c800;color:#f5c800}
 .merch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .merch-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;overflow:hidden}
 .merch-img{height:140px;background:#111;display:flex;align-items:center;justify-content:center;font-size:40px;border-bottom:1px solid #1e1e1e}
@@ -105,7 +98,6 @@ select option{background:#111}
       <a class="nav-link active" onclick="showPage('home',this)">Hjem</a>
       <a class="nav-link" onclick="showPage('results',this)">Resultater</a>
       <a class="nav-link" onclick="showPage('stats',this)">Stats</a>
-      <a class="nav-link" onclick="showPage('gallery',this)">Galleri</a>
       <a class="nav-link" onclick="showPage('merch',this)">Merch</a>
     </div>
     <div class="nav-login" id="nav-login"></div>
@@ -153,10 +145,10 @@ select option{background:#111}
         <th onclick="sortStats('assists')">A</th>
         <th onclick="sortStats('deaths')">D</th>
         <th onclick="sortStats('kd_diff')">+/-</th>
-        <th onclick="sortStats('maps_played')">Runder</th>
+        <th onclick="sortStats('rounds_played')">Runder</th>
         <th onclick="sortStats('rating')">Rating</th>
-        <th>Damage</th>
-        <th>ADR</th>
+        <th onclick="sortStats('damage')">Damage</th>
+        <th onclick="sortStats('adr')">ADR</th>
         <th onclick="sortStats('entry_kills')">Entry Kills</th>
         <th onclick="sortStats('hs_pct')">HS%</th>
         <th onclick="sortStats('clutches')">Clutcher</th>
@@ -173,22 +165,6 @@ select option{background:#111}
   </div>
   <div id="stats-empty" style="text-align:center;padding:3rem;color:#555;font-size:14px">
     Laster statistikk fra ggarena.no...
-  </div>
-</div>
-
-<div id="page-gallery" class="page">
-  <div class="section-header"><span class="section-title">Bildegalleri</span><div class="section-line"></div></div>
-  <div class="gallery-grid" id="gallery-grid">
-    <div class="gallery-item"><div class="gallery-placeholder">📸</div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">🎮</div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">🏆</div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">💻</div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">🎯</div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">🖥️</div></div>
-  </div>
-  <div class="upload-zone" style="margin-top:1rem" onclick="document.getElementById('img-upload').click()">
-    Klikk for å laste opp bilder (erstatter plassholderne)
-    <input id="img-upload" type="file" accept="image/*" multiple style="display:none" onchange="handleImages(event)" />
   </div>
 </div>
 
@@ -224,8 +200,10 @@ var STEAM_MAP = {
   '76561197961088944': 'MarcusCraig',
   '76561198219508820': 'Maikro',
   '76561198048783574': 'baten420',
-  '76561198069052064': 'woznor'
+  '76561198069052064': 'woznor',
+  '76561198041841445': 'Laserturken'
 };
+var ALL_PLAYERS = Object.values(STEAM_MAP);
 
 /* ---- Steam OpenID login ---- */
 function steamLogin() {
@@ -332,6 +310,23 @@ function generateTirsdager(occupiedDates) {
   return result;
 }
 
+/* ---- Vote summary for an event ---- */
+function votesSummary(mid) {
+  var groups = { ja: [], nei: [], usikker: [] };
+  ALL_PLAYERS.forEach(function(pl) {
+    var v = (votes[pl] || {})[mid];
+    if (v && groups[v]) groups[v].push(pl);
+  });
+  var parts = [];
+  if (groups.ja.length)      parts.push('<span style="color:#22c55e">' + groups.ja.join(', ') + '</span>');
+  if (groups.nei.length)     parts.push('<span style="color:#ef4444">' + groups.nei.join(', ') + '</span>');
+  if (groups.usikker.length) parts.push('<span style="color:#f59e0b">' + groups.usikker.join(', ') + '</span>');
+  if (!parts.length) return '';
+  return '<div style="font-size:11px;color:#555;margin-top:5px;display:flex;gap:8px;flex-wrap:wrap">'
+    + parts.join('<span style="color:#333">|</span>')
+    + '</div>';
+}
+
 /* ---- Render home (upcoming: future + no result) ---- */
 function renderHome() {
   var todayStr = localDateStr(today());
@@ -354,6 +349,7 @@ function renderHome() {
         + '<button class="vote-btn' + (myVote === 'nei' ? ' active-nei' : '') + '" onclick="setVote(\'' + mid + '\',\'nei\')">Nei</button>'
         + '<button class="vote-btn' + (myVote === 'usikker' ? ' active-usikker' : '') + '" onclick="setVote(\'' + mid + '\',\'usikker\')">Uncertainty looms</button>'
         + '</div>'
+        + votesSummary(mid)
       : '<span style="font-size:11px;color:#444">—</span>';
     return '<tr>'
       + '<td style="color:#888;font-size:13px;white-space:nowrap">' + ev.date + '</td>'
@@ -364,11 +360,11 @@ function renderHome() {
   }).join('');
 }
 
-/* ---- Render results (completed + past unresolved matches) ---- */
+/* ---- Render results (completed matches) ---- */
 function renderResults() {
   var todayStr = localDateStr(today());
   var done = events
-    .filter(function(e) { return e.won === true || e.won === false || (e.type === 'match' && e.date < todayStr); })
+    .filter(function(e) { return e.won === true || e.won === false; })
     .sort(function(a, b) { return b.date.localeCompare(a.date); });
   var b = document.getElementById('results-body');
   if (!done.length) {
@@ -377,14 +373,15 @@ function renderResults() {
   }
   b.innerHTML = done.map(function(ev) {
     var badge = ev.won
-      ? '<span class="badge badge-win">W</span>'
-      : '<span class="badge badge-loss">L</span>';
-    var scoreM = ev.title.match(/(\d+)-(\d+)/);
+      ? '<span class="badge badge-win">Seier</span>'
+      : '<span class="badge badge-loss">Tap</span>';
+    var scoreStr = (ev.score_us != null && ev.score_them != null) ? ev.score_us + ' – ' + ev.score_them : '—';
+    var opponent = ev.opponent || ev.title;
     return '<tr>'
       + '<td style="color:#888;font-size:13px;white-space:nowrap">' + ev.date + '</td>'
-      + '<td style="font-weight:500">' + ev.title + '</td>'
+      + '<td style="font-weight:500">Vepsene vs ' + opponent + '</td>'
       + '<td>' + badge + '</td>'
-      + '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:16px;color:#888">' + (scoreM ? scoreM[0] : '—') + '</td>'
+      + '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:16px;color:#888">' + scoreStr + '</td>'
       + '</tr>';
   }).join('');
 }
@@ -424,13 +421,17 @@ function loadStatsJson(data) {
   }
   var matches = data.matches || [];
   events = matches.map(function(m) {
-    var won = m.won;
-    var score = (m.score_us != null) ? ' ' + m.score_us + '-' + m.score_them : '';
-    var title = won === true ? 'Vepsene vant mot ' + m.opponent + score
-      : won === false ? 'Vepsene tapte mot ' + m.opponent + score
-      : 'Vepsene vs ' + m.opponent;
     var safeOpp = (m.opponent || '').replace(/[^a-z0-9]/gi, '_');
-    return { title: title, type: 'match', date: m.date, won: won, id: m.date + '_' + safeOpp };
+    return {
+      title: 'Vepsene vs ' + m.opponent,
+      type: 'match',
+      date: m.date,
+      won: m.won,
+      opponent: m.opponent,
+      score_us: m.score_us,
+      score_them: m.score_them,
+      id: m.date + '_' + safeOpp
+    };
   });
   document.getElementById('stats-empty').style.display = 'none';
   document.getElementById('stats-updated').style.display = 'block';
@@ -464,10 +465,10 @@ function renderStats() {
       + cell(p.assists)
       + cell(p.deaths)
       + '<td style="' + kdStyle + '">' + (kd != null ? (kd > 0 ? '+' : '') + kd : '—') + '</td>'
-      + cell(p.maps_played)
+      + cell(p.rounds_played != null ? p.rounds_played : p.maps_played)
       + '<td><span class="' + cls + '">' + r.toFixed(2) + '</span><span class="rank-bar" style="width:' + barW + 'px"></span></td>'
-      + cell(p.damage)
-      + cell(p.adr)
+      + cell(p.damage != null ? p.damage.toLocaleString('nb-NO') : null)
+      + cell(p.adr != null ? Math.round(p.adr) : null)
       + cell(p.entry_kills)
       + '<td>' + (hs || '—') + '</td>'
       + cell(p.clutches)
@@ -482,27 +483,6 @@ function renderStats() {
 }
 
 function sortStats(k) { sortKey = k; sortDir *= -1; renderStats(); }
-
-function handleImages(e) {
-  var grid = document.getElementById('gallery-grid');
-  var items = grid.querySelectorAll('.gallery-item');
-  var idx = 0;
-  Array.from(e.target.files).forEach(function(f) {
-    var r = new FileReader();
-    r.onload = function(ev) {
-      if (idx < items.length) {
-        items[idx].innerHTML = '<img class="gallery-img" src="' + ev.target.result + '" />';
-        idx++;
-      } else {
-        var d = document.createElement('div');
-        d.className = 'gallery-item';
-        d.innerHTML = '<img class="gallery-img" src="' + ev.target.result + '" />';
-        grid.appendChild(d);
-      }
-    };
-    r.readAsDataURL(f);
-  });
-}
 
 function addToCart(item, price) {
   cart[item] = (cart[item] || 0) + 1;
