@@ -350,6 +350,11 @@ function generateTirsdager(occupiedDates) {
 }
 
 /* ---- Vote summary for an event ---- */
+function fmtDate(iso) {
+  var p = iso.split('-');
+  return p[2] + '.' + p[1] + '.' + p[0];
+}
+
 function votesSummary(mid) {
   var groups = { ja: [], nei: [], usikker: [] };
   ALL_PLAYERS.forEach(function(pl) {
@@ -391,7 +396,7 @@ function renderHome() {
         + votesSummary(mid)
       : '<span style="font-size:11px;color:#444">—</span>';
     return '<tr>'
-      + '<td style="color:#888;font-size:13px;white-space:nowrap">' + ev.date + '</td>'
+      + '<td style="color:#888;font-size:13px;white-space:nowrap">' + fmtDate(ev.date) + '</td>'
       + '<td style="font-weight:500">' + ev.title + '</td>'
       + '<td>' + typeLabel(ev.type) + '</td>'
       + '<td>' + voteHtml + '</td>'
