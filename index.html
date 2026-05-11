@@ -30,6 +30,7 @@ nav{background:#0d0d0d;border-bottom:1px solid #f5c800;padding:0 1.5rem;position
 .badge{display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;font-weight:500}
 .badge-match{background:#1a1a00;color:#f5c800;border:1px solid #f5c800}
 .badge-tuesday{background:#1a0033;color:#a855f7;border:1px solid #6b21a8}
+.badge-special{background:#1a0a00;color:#f97316;border:1px solid #9a3412}
 .badge-win{background:#001a0d;color:#22c55e;border:1px solid #166534}
 .badge-loss{background:#1a0000;color:#ef4444;border:1px solid #7f1d1d}
 .cal-btn{font-size:11px;padding:4px 10px;background:transparent;border:1px solid #1e1e1e;color:#888;border-radius:2px;cursor:pointer;transition:all .2s;font-family:'Barlow',sans-serif}
@@ -198,6 +199,9 @@ select option{background:#111}
 
 <script>
 var events = [];
+var specialEvents = [
+  { title: 'Ekstraordinær Vepsene-tirsdag', type: 'special', date: '2026-05-11', won: null, id: '2026-05-11_ekstraordinaer' }
+];
 var cart = {};
 var statsData = [];
 var sortKey = 'rating', sortDir = 1;
@@ -387,7 +391,8 @@ function renderHome() {
   var allMatchDates = events.map(function(e) { return e.date; });
   var tirsdager = generateTirsdager(allMatchDates);
   var upcoming = events.filter(function(e) { return e.won == null && e.date >= todayStr; });
-  var all = upcoming.concat(tirsdager).sort(function(a, b) { return a.date.localeCompare(b.date); });
+  var special = specialEvents.filter(function(e) { return e.date >= todayStr; });
+  var all = upcoming.concat(tirsdager).concat(special).sort(function(a, b) { return a.date.localeCompare(b.date); });
 
   var b = document.getElementById('home-body');
   if (!all.length) {
@@ -444,6 +449,7 @@ function renderResults() {
 function typeLabel(t) {
   if (t === 'match') return '<span class="badge badge-match">Kamp</span>';
   if (t === 'tuesday') return '<span class="badge badge-tuesday">Vepsene-tirsdag</span>';
+  if (t === 'special') return '<span class="badge badge-special">Ekstraordinær</span>';
   return '<span class="badge" style="background:#111;color:#555;border:1px solid #1e1e1e">Trening</span>';
 }
 
