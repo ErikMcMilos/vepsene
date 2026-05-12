@@ -373,7 +373,7 @@ function generateTirsdager(occupiedDates) {
   while (d <= end) {
     var ds = localDateStr(d);
     if (occupiedDates.indexOf(ds) === -1) {
-      result.push({ title: 'Vepsene-tirsdag', type: 'tuesday', date: ds, id: ds + '_tirsdag', won: null });
+      result.push({ title: 'Vepsene-tirsdag', type: 'tuesday', date: ds, id: ds + '_tirsdag', won: null, time: 'Nøyaktig ca 19ish' });
     }
     d.setDate(d.getDate() + 7);
   }
@@ -427,9 +427,12 @@ function renderHome() {
         + '</div>'
         + votesSummary(mid)
       : '<span style="font-size:11px;color:#444">—</span>';
+    var timeHtml = ev.time
+      ? '<div style="font-size:11px;color:#f5c800;margin-top:3px;letter-spacing:.5px">' + ev.time + '</div>'
+      : '';
     return '<tr>'
       + '<td style="color:#888;font-size:13px;white-space:nowrap">' + fmtDate(ev.date) + '</td>'
-      + '<td style="font-weight:500">' + ev.title + '</td>'
+      + '<td style="font-weight:500">' + ev.title + timeHtml + '</td>'
       + '<td>' + typeLabel(ev.type) + '</td>'
       + '<td>' + voteHtml + '</td>'
       + '</tr>';
@@ -537,6 +540,7 @@ function loadStatsJson(data) {
       opponent: m.opponent,
       score_us: m.score_us,
       score_them: m.score_them,
+      time: m.time || null,
       id: m.date + '_' + safeOpp
     };
   });
