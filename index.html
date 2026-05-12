@@ -77,6 +77,13 @@ label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;disp
 select{background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:8px 12px;border-radius:2px;font-size:14px;font-family:'Barlow',sans-serif;outline:none;width:100%}
 select:focus{border-color:#f5c800}
 select option{background:#111}
+#callouts-lock{position:absolute;inset:0;background:#0a0a0a;z-index:10;display:flex;align-items:center;justify-content:center;min-height:300px}
+#callouts-lock-box{text-align:center;max-width:360px;padding:2rem;width:100%}
+#callouts-question{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;color:#f5c800;letter-spacing:2px;margin-bottom:.5rem}
+#callouts-hint{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#444;margin-bottom:2rem}
+#callouts-input{width:100%;background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:10px 14px;font-size:15px;font-family:'Barlow',sans-serif;border-radius:2px;outline:none;text-align:center;transition:border-color .2s}
+#callouts-input:focus{border-color:#f5c800}
+#callouts-error{font-size:12px;color:#ef4444;margin-top:1rem;min-height:1.2em}
 </style>
 </head>
 <body>
@@ -187,11 +194,21 @@ select option{background:#111}
   </div>
 </div>
 
-<div id="page-callouts" class="page">
-  <div class="section-header"><span class="section-title">Map Callouts</span><div class="section-line"></div></div>
-  <div style="margin-bottom:2.5rem">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#f5c800;margin-bottom:1rem">Ancient</div>
-    <img src="ancient_callouts.png" alt="Ancient callouts" style="max-width:100%;border:1px solid #1e1e1e;border-radius:4px;display:block" />
+<div id="page-callouts" class="page" style="position:relative">
+  <div id="callouts-lock">
+    <div id="callouts-lock-box">
+      <div id="callouts-question">Sprenge døra?</div>
+      <div id="callouts-hint">Skriv svaret for å låse opp</div>
+      <input id="callouts-input" type="text" autocomplete="off" placeholder="…" onkeydown="if(event.key==='Enter')checkCalloutsPassword()" />
+      <div id="callouts-error"></div>
+    </div>
+  </div>
+  <div id="callouts-content">
+    <div class="section-header"><span class="section-title">Map Callouts</span><div class="section-line"></div></div>
+    <div style="margin-bottom:2.5rem">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#f5c800;margin-bottom:1rem">Ancient</div>
+      <img src="ancient_callouts.png" alt="Ancient callouts" style="max-width:100%;border:1px solid #1e1e1e;border-radius:4px;display:block" />
+    </div>
   </div>
 </div>
 
@@ -453,6 +470,27 @@ function typeLabel(t) {
   return '<span class="badge" style="background:#111;color:#555;border:1px solid #1e1e1e">Trening</span>';
 }
 
+/* ---- Callouts quiz ---- */
+var calloutsUnlocked = sessionStorage.getItem('vepsene_callouts') === '1';
+
+function checkCalloutsPassword() {
+  var raw = document.getElementById('callouts-input').value;
+  var s = raw.toLowerCase().replace(/[^a-zæøå0-9 ]/g, '');
+  var hasMassiv = /massiv(e)?/.test(s);
+  var hasMahogni = /mah[ao]g[ao]n[iy]?/.test(s);
+  if (hasMassiv && hasMahogni) {
+    calloutsUnlocked = true;
+    sessionStorage.setItem('vepsene_callouts', '1');
+    document.getElementById('callouts-lock').style.display = 'none';
+    document.getElementById('callouts-error').textContent = '';
+  } else {
+    document.getElementById('callouts-error').textContent = 'Feil svar. Prøv igjen.';
+    var inp = document.getElementById('callouts-input');
+    inp.style.borderColor = '#ef4444';
+    setTimeout(function() { inp.style.borderColor = ''; }, 800);
+  }
+}
+
 function showPage(p, el) {
   document.querySelectorAll('.page').forEach(function(x) { x.classList.remove('active'); });
   document.querySelectorAll('.nav-link').forEach(function(x) { x.classList.remove('active'); });
@@ -460,6 +498,15 @@ function showPage(p, el) {
   if (el) el.classList.add('active');
   if (p === 'stats') renderStats();
   if (p === 'results') renderResults();
+  if (p === 'callouts') {
+    var lock = document.getElementById('callouts-lock');
+    if (calloutsUnlocked) {
+      lock.style.display = 'none';
+    } else {
+      lock.style.display = 'flex';
+      setTimeout(function() { document.getElementById('callouts-input').focus(); }, 50);
+    }
+  }
 }
 
 /* ---- Stats ---- */
