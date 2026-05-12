@@ -11,7 +11,7 @@ Faller tilbake til grunnleggende stats uten cookie.
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
@@ -150,8 +150,19 @@ def main():
         if winning_side:
             won = (winning_side == "home") == is_home
 
+        start_raw = m.get("start_time") or ""
+        match_time = None
+        if start_raw:
+            try:
+                dt_utc = datetime.fromisoformat(start_raw.replace("Z", "+00:00"))
+                dt_local = dt_utc.astimezone(timezone(timedelta(hours=2)))  # Oslo (CEST)
+                match_time = dt_local.strftime("%H:%M")
+            except Exception:
+                pass
+
         match_list.append({
-            "date": (m.get("start_time") or "")[:10],
+            "date": start_raw[:10],
+            "time": match_time,
             "opponent": opponent,
             "home": is_home,
             "score_us": score_us,
