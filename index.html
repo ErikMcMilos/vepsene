@@ -476,7 +476,7 @@ var calloutsUnlocked = sessionStorage.getItem('vepsene_callouts') === '1';
 function checkCalloutsPassword() {
   var raw = document.getElementById('callouts-input').value;
   var s = raw.toLowerCase().replace(/[^a-zæøå0-9 ]/g, '');
-  var hasMassiv = /massiv(e)?/.test(s);
+  var hasMassiv = s.indexOf('massiv') !== -1;
   var hasMahogni = /mah[ao]g[ao]?n[iy]?/.test(s);
   if (hasMassiv && hasMahogni) {
     calloutsUnlocked = true;
