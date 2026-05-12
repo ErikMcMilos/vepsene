@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-12T14:11:33.804000+00:00",
+  "updated": "2026-05-12T19:00:00.000000+00:00",
   "competition": "Komplettligaen: Counter-strike - Våren 2026",
   "extended": false,
   "players": [
@@ -10,10 +10,10 @@
       "assists": 59,
       "deaths": 201,
       "kd_diff": 26,
-      "maps_played": 11,
-      "rounds_played": 272,
+      "maps_played": 13,
+      "rounds_played": 273,
       "damage": 23744,
-      "adr": 86.0,
+      "adr": 86,
       "hs_pct": 52.0,
       "entry_kills": 31,
       "clutches": 7,
@@ -23,7 +23,7 @@
       "k3": 16,
       "k4": 2,
       "k5": 0,
-      "kast": null
+      "kast": 70.0
     },
     {
       "name": "Waffuru",
@@ -32,10 +32,10 @@
       "assists": 75,
       "deaths": 206,
       "kd_diff": -13,
-      "maps_played": 11,
-      "rounds_played": 275,
+      "maps_played": 13,
+      "rounds_played": 273,
       "damage": 22541,
-      "adr": 82.0,
+      "adr": 82,
       "hs_pct": 40.0,
       "entry_kills": 31,
       "clutches": 5,
@@ -45,7 +45,7 @@
       "k3": 13,
       "k4": 2,
       "k5": 0,
-      "kast": null
+      "kast": 67.0
     },
     {
       "name": "Maikro",
@@ -54,10 +54,10 @@
       "assists": 61,
       "deaths": 215,
       "kd_diff": -11,
-      "maps_played": 11,
-      "rounds_played": 272,
+      "maps_played": 13,
+      "rounds_played": 273,
       "damage": 22471,
-      "adr": 82.0,
+      "adr": 82,
       "hs_pct": 34.0,
       "entry_kills": 21,
       "clutches": 3,
@@ -67,7 +67,7 @@
       "k3": 11,
       "k4": 2,
       "k5": 0,
-      "kast": null
+      "kast": 68.0
     },
     {
       "name": "woznor",
@@ -76,10 +76,10 @@
       "assists": 12,
       "deaths": 45,
       "kd_diff": -4,
-      "maps_played": 1,
+      "maps_played": 3,
       "rounds_played": 70,
       "damage": 4850,
-      "adr": 69.0,
+      "adr": 69,
       "hs_pct": 29.0,
       "entry_kills": 7,
       "clutches": 1,
@@ -89,7 +89,7 @@
       "k3": 1,
       "k4": 1,
       "k5": 0,
-      "kast": null
+      "kast": 71.0
     },
     {
       "name": "MarcusCraig",
@@ -98,10 +98,10 @@
       "assists": 50,
       "deaths": 212,
       "kd_diff": -48,
-      "maps_played": 11,
-      "rounds_played": 272,
+      "maps_played": 13,
+      "rounds_played": 273,
       "damage": 17332,
-      "adr": 63.0,
+      "adr": 63,
       "hs_pct": 48.0,
       "entry_kills": 24,
       "clutches": 1,
@@ -111,7 +111,7 @@
       "k3": 8,
       "k4": 2,
       "k5": 0,
-      "kast": null
+      "kast": 64.0
     },
     {
       "name": "Gru91",
@@ -123,7 +123,7 @@
       "maps_played": 10,
       "rounds_played": 203,
       "damage": 11360,
-      "adr": 55.0,
+      "adr": 55,
       "hs_pct": 38.0,
       "entry_kills": 11,
       "clutches": 8,
@@ -133,7 +133,7 @@
       "k3": 4,
       "k4": 0,
       "k5": 0,
-      "kast": null
+      "kast": 56.0
     }
   ],
   "matches": [
@@ -178,9 +178,9 @@
       "time": "19:00",
       "opponent": "pang_pangesen",
       "home": false,
-      "score_us": null,
-      "score_them": null,
-      "won": null
+      "score_us": 2,
+      "score_them": 1,
+      "won": true
     },
     {
       "date": "2026-05-14",
