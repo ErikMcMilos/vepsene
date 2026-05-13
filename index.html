@@ -84,6 +84,11 @@ select option{background:#111}
 #callouts-input{width:100%;background:#111;border:1px solid #1e1e1e;color:#e8e8e0;padding:10px 14px;font-size:15px;font-family:'Barlow',sans-serif;border-radius:2px;outline:none;text-align:center;transition:border-color .2s}
 #callouts-input:focus{border-color:#f5c800}
 #callouts-error{font-size:12px;color:#ef4444;margin-top:1rem;min-height:1.2em}
+.summer-program-step{display:flex;gap:1rem;align-items:flex-start;padding:.9rem 0;border-bottom:1px solid #111}
+.summer-program-step:last-child{border-bottom:none}
+.summer-step-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#f5c800;flex-shrink:0;width:28px;text-align:center;line-height:1.2}
+.summer-step-title{font-size:14px;font-weight:500;color:#e8e8e0;margin-bottom:3px}
+.summer-step-desc{font-size:12px;color:#666;line-height:1.5}
 </style>
 </head>
 <body>
@@ -105,6 +110,7 @@ select option{background:#111}
     <div class="nav-logo" onclick="showPage('home',document.querySelector('.nav-link'))">VEPSENE</div>
     <div class="nav-links">
       <a class="nav-link active" onclick="showPage('home',this)">Hjem</a>
+      <a class="nav-link" onclick="showPage('terminliste',this)">Terminliste</a>
       <a class="nav-link" onclick="showPage('results',this)">Resultater</a>
       <a class="nav-link" onclick="showPage('stats',this)">Stats</a>
       <a class="nav-link" onclick="showPage('merch',this)">Merch</a>
@@ -117,15 +123,78 @@ select option{background:#111}
 
 <div class="site">
 
+<!-- ===== HJEM: Sommeravslutning ===== -->
 <div id="page-home" class="page active">
+
+  <div style="text-align:center;padding:2.5rem 0 1.5rem">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#888;margin-bottom:.6rem">Vepsene inviterer til</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:58px;font-weight:700;letter-spacing:4px;color:#f5c800;text-transform:uppercase;line-height:1">Sommeravslutning</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;letter-spacing:4px;color:#666;margin-top:.4rem;text-transform:uppercase">Juni 2026</div>
+    <div style="font-size:13px;color:#555;margin-top:.75rem;letter-spacing:.5px">Dato avgjores ved stemme — se nedenfor</div>
+  </div>
+
+  <div style="display:flex;justify-content:center;margin-bottom:2.5rem">
+    <img src="gru.png" alt="Gru" style="max-height:280px;max-width:90%;object-fit:contain" />
+  </div>
+
+  <div style="max-width:540px;margin:0 auto 2.5rem;background:#0d0d0d;border:1px solid #1e1e1e;border-top:3px solid #f5c800;border-radius:4px;padding:1.75rem 2rem">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#f5c800;margin-bottom:1rem">Kveldsprogram</div>
+    <div>
+      <div class="summer-program-step">
+        <div class="summer-step-num">1</div>
+        <div>
+          <div class="summer-step-title">Strawberry daiquiri</div>
+          <div class="summer-step-desc">Vi sparker i gang kvelden med en frisk strawberry daiquiri. Den eneste riktige maten for anledningen.</div>
+        </div>
+      </div>
+      <div class="summer-program-step">
+        <div class="summer-step-num">2</div>
+        <div>
+          <div class="summer-step-title">Nanbrødpizza og chili cheese</div>
+          <div class="summer-step-desc">Hjemmelaget nanbrødpizza med Peppes biff-topping og chili cheese ved siden av. <span style="color:#f5c800">Jeppe: bestem om du vil ha biff eller et annet alternativ fra Peppes-menyen — det er din kveld.</span></div>
+        </div>
+      </div>
+      <div class="summer-program-step">
+        <div class="summer-step-num">3</div>
+        <div>
+          <div class="summer-step-title">LAN — House of Nerds</div>
+          <div class="summer-step-desc">Klassisk Vepsene-LAN. Vi setter opp riggene og spiller til vi ikke klarer mer.</div>
+        </div>
+      </div>
+      <div class="summer-program-step">
+        <div class="summer-step-num">4</div>
+        <div>
+          <div class="summer-step-title">Avslutte pa O'Learys</div>
+          <div class="summer-step-desc">Kvelden rundes av med en velfortjent kald pa O'Learys. Skjermene slukkes, glasset heves.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:540px;margin:0 auto">
+    <div class="section-header">
+      <span class="section-title">Stem pa dato</span>
+      <div class="section-line"></div>
+      <span id="summer-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for a stemme</span>
+    </div>
+    <table class="matches-table">
+      <thead><tr><th>Dato</th><th>Dag</th><th>Stemmer</th></tr></thead>
+      <tbody id="summer-vote-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ===== TERMINLISTE (tidligere Hjem) ===== -->
+<div id="page-terminliste" class="page">
   <div class="section-header">
     <span class="section-title">Kommende</span>
     <div class="section-line"></div>
-    <span id="home-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for å stemme</span>
+    <span id="terminliste-login-hint" style="font-size:11px;color:#555;white-space:nowrap">Logg inn for å stemme</span>
   </div>
   <table class="matches-table">
     <thead><tr><th>Dato</th><th>Arrangement</th><th>Type</th><th>Stemmer</th></tr></thead>
-    <tbody id="home-body"></tbody>
+    <tbody id="terminliste-body"></tbody>
   </table>
 </div>
 
@@ -225,6 +294,18 @@ var sortKey = 'rating', sortDir = 1;
 var currentPlayer = localStorage.getItem('vepsene_player') || null;
 var votes = JSON.parse(localStorage.getItem('vepsene_votes') || '{}');
 
+/* ---- Sommeravslutning datoer: alle fredager og lørdager i juni 2026 ---- */
+var summerDates = [
+  { date: '2026-06-05', day: 'Fredag',  id: 'summer_2026-06-05' },
+  { date: '2026-06-06', day: 'Lordag',  id: 'summer_2026-06-06' },
+  { date: '2026-06-12', day: 'Fredag',  id: 'summer_2026-06-12' },
+  { date: '2026-06-13', day: 'Lordag',  id: 'summer_2026-06-13' },
+  { date: '2026-06-19', day: 'Fredag',  id: 'summer_2026-06-19' },
+  { date: '2026-06-20', day: 'Lordag',  id: 'summer_2026-06-20' },
+  { date: '2026-06-26', day: 'Fredag',  id: 'summer_2026-06-26' },
+  { date: '2026-06-27', day: 'Lordag',  id: 'summer_2026-06-27' }
+];
+
 /* ---- Live stemmedeling via GitHub Gist ---- */
 var GIST_ID = '944a3e28449f64c9fe74aea224c5f759';
 var GIST_API = 'https://api.github.com/gists/' + GIST_ID;
@@ -247,7 +328,8 @@ function fetchVotes() {
       });
       if (changed) {
         localStorage.setItem('vepsene_votes', JSON.stringify(votes));
-        renderHome();
+        renderTerminliste();
+        renderSummerVotes();
       }
     })
     .catch(function() {});
@@ -299,7 +381,6 @@ function checkSteamReturn() {
       currentPlayer = player;
       localStorage.setItem('vepsene_player', player);
     } else {
-      // Steam-konto ikke på godkjent liste
       document.getElementById('gate-denied').style.display = 'block';
     }
   }
@@ -315,21 +396,25 @@ function lockSite() {
   localStorage.removeItem('vepsene_player');
   document.getElementById('gate').style.display = 'flex';
   updateLoginBar();
-  renderHome();
+  renderTerminliste();
+  renderSummerVotes();
 }
 
 function doLogout() {
   lockSite();
 }
+
 function updateLoginBar() {
   var el = document.getElementById('nav-login');
-  var hint = document.getElementById('home-login-hint');
+  var hints = ['summer-login-hint', 'terminliste-login-hint'].map(function(id) {
+    return document.getElementById(id);
+  });
   if (currentPlayer) {
     el.innerHTML = '<span class="player-name">' + currentPlayer + '</span>&nbsp;<button class="cal-btn" onclick="doLogout()">Logg ut</button>';
-    if (hint) hint.style.display = 'none';
+    hints.forEach(function(h) { if (h) h.style.display = 'none'; });
   } else {
     el.innerHTML = '';
-    if (hint) hint.style.display = '';
+    hints.forEach(function(h) { if (h) h.style.display = ''; });
   }
 }
 
@@ -343,7 +428,8 @@ function setVote(mid, vote) {
     votes[currentPlayer][mid] = vote;
   }
   localStorage.setItem('vepsene_votes', JSON.stringify(votes));
-  renderHome();
+  renderTerminliste();
+  renderSummerVotes();
   pushVotes();
 }
 function getVote(mid) {
@@ -367,9 +453,9 @@ function generateTirsdager(occupiedDates) {
   var result = [];
   var d = today();
   var daysToTue = (2 - d.getDay() + 7) % 7;
-  if (daysToTue === 0) daysToTue = 7; // skip today if it's Tuesday, start next week
+  if (daysToTue === 0) daysToTue = 7;
   d.setDate(d.getDate() + daysToTue);
-  var end = new Date(2026, 5, 30); // 30. juni 2026, lokal tid
+  var end = new Date(2026, 5, 30);
   while (d <= end) {
     var ds = localDateStr(d);
     if (occupiedDates.indexOf(ds) === -1) {
@@ -402,8 +488,20 @@ function votesSummary(mid) {
     + '</div>';
 }
 
-/* ---- Render home (upcoming: future + no result) ---- */
-function renderHome() {
+function voteButtons(mid) {
+  var myVote = getVote(mid);
+  return currentPlayer
+    ? '<div style="display:flex;gap:4px;flex-wrap:wrap">'
+      + '<button class="vote-btn' + (myVote === 'ja' ? ' active-ja' : '') + '" onclick="setVote(\'' + mid + '\',\'ja\')">Ja</button>'
+      + '<button class="vote-btn' + (myVote === 'nei' ? ' active-nei' : '') + '" onclick="setVote(\'' + mid + '\',\'nei\')">Nei</button>'
+      + '<button class="vote-btn' + (myVote === 'usikker' ? ' active-usikker' : '') + '" onclick="setVote(\'' + mid + '\',\'usikker\')">Uncertainty looms</button>'
+      + '</div>'
+      + votesSummary(mid)
+    : '<span style="font-size:11px;color:#444">—</span>';
+}
+
+/* ---- Render terminliste (upcoming) ---- */
+function renderTerminliste() {
   var todayStr = localDateStr(today());
   var allMatchDates = events.map(function(e) { return e.date; });
   var tirsdager = generateTirsdager(allMatchDates);
@@ -411,22 +509,14 @@ function renderHome() {
   var special = specialEvents.filter(function(e) { return e.date >= todayStr; });
   var all = upcoming.concat(tirsdager).concat(special).sort(function(a, b) { return a.date.localeCompare(b.date); });
 
-  var b = document.getElementById('home-body');
+  var b = document.getElementById('terminliste-body');
+  if (!b) return;
   if (!all.length) {
     b.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:#555">Ingen kommende arrangementer</td></tr>';
     return;
   }
   b.innerHTML = all.map(function(ev) {
     var mid = ev.id;
-    var myVote = getVote(mid);
-    var voteHtml = currentPlayer
-      ? '<div style="display:flex;gap:4px;flex-wrap:wrap">'
-        + '<button class="vote-btn' + (myVote === 'ja' ? ' active-ja' : '') + '" onclick="setVote(\'' + mid + '\',\'ja\')">Ja</button>'
-        + '<button class="vote-btn' + (myVote === 'nei' ? ' active-nei' : '') + '" onclick="setVote(\'' + mid + '\',\'nei\')">Nei</button>'
-        + '<button class="vote-btn' + (myVote === 'usikker' ? ' active-usikker' : '') + '" onclick="setVote(\'' + mid + '\',\'usikker\')">Uncertainty looms</button>'
-        + '</div>'
-        + votesSummary(mid)
-      : '<span style="font-size:11px;color:#444">—</span>';
     var timeHtml = ev.time
       ? '<div style="font-size:11px;color:#f5c800;margin-top:3px;letter-spacing:.5px">' + ev.time + '</div>'
       : '';
@@ -434,14 +524,28 @@ function renderHome() {
       + '<td style="color:#888;font-size:13px;white-space:nowrap">' + fmtDate(ev.date) + '</td>'
       + '<td style="font-weight:500">' + ev.title + timeHtml + '</td>'
       + '<td>' + typeLabel(ev.type) + '</td>'
-      + '<td>' + voteHtml + '</td>'
+      + '<td>' + voteButtons(mid) + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+/* ---- Render summer votes ---- */
+function renderSummerVotes() {
+  var hint = document.getElementById('summer-login-hint');
+  if (hint) hint.style.display = currentPlayer ? 'none' : '';
+  var b = document.getElementById('summer-vote-body');
+  if (!b) return;
+  b.innerHTML = summerDates.map(function(sd) {
+    return '<tr>'
+      + '<td style="color:#888;font-size:13px;white-space:nowrap">' + fmtDate(sd.date) + '</td>'
+      + '<td style="color:#e8e8e0;font-size:13px">' + sd.day + '</td>'
+      + '<td>' + voteButtons(sd.id) + '</td>'
       + '</tr>';
   }).join('');
 }
 
 /* ---- Render results (completed matches) ---- */
 function renderResults() {
-  var todayStr = localDateStr(today());
   var done = events
     .filter(function(e) { return e.won === true || e.won === false; })
     .sort(function(a, b) { return b.date.localeCompare(a.date); });
@@ -501,6 +605,8 @@ function showPage(p, el) {
   if (el) el.classList.add('active');
   if (p === 'stats') renderStats();
   if (p === 'results') renderResults();
+  if (p === 'terminliste') renderTerminliste();
+  if (p === 'home') renderSummerVotes();
   if (p === 'callouts') {
     var lock = document.getElementById('callouts-lock');
     if (calloutsUnlocked) {
@@ -549,7 +655,7 @@ function loadStatsJson(data) {
   document.getElementById('stats-updated').textContent = 'Oppdatert: ' + new Date(data.updated).toLocaleString('nb-NO');
   updateKPI();
   renderStats();
-  renderHome();
+  renderTerminliste();
   renderResults();
 }
 
@@ -609,8 +715,9 @@ if (currentPlayer) {
   updateLoginBar();
   fetchVotes();
   setInterval(fetchVotes, 30000);
-  renderHome();
 }
+renderSummerVotes();
+renderTerminliste();
 
 fetch('stats.json')
   .then(function(r) { return r.json(); })
